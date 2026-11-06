@@ -2330,3 +2330,292 @@ button {
     font-size: 16px;
   }
 }
+/* ===================================================
+   DASHBOARD PEMASUKAN - COCOK DENGAN HTML ADMIN
+   =================================================== */
+.income-panel {
+  min-width: 0;
+  padding: 20px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(16, 35, 60, 0.04);
+}
+
+.income-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+}
+
+.income-heading h2 {
+  margin: 0 0 4px;
+  color: var(--navy);
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.income-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Filter tanggal, bulan, tahun */
+.income-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.income-filter-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 5px;
+}
+
+.income-filter-field label {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+}
+
+.income-filter-field input,
+.income-filter-field select {
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  padding: 0 10px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--navy);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.income-filter-field input:focus,
+.income-filter-field select:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+/* Tiga kartu pemasukan */
+.income-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.income-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 6px;
+  padding: 14px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.income-card-head {
+  min-width: 0;
+}
+
+.income-card-head span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.income-card strong {
+  display: block;
+  color: var(--navy);
+  font-size: 20px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.income-card small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.income-card-day {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.income-card-day strong {
+  color: #1d4ed8;
+}
+
+.income-card-month {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.income-card-month strong {
+  color: #047857;
+}
+
+.income-card-year {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.income-card-year strong {
+  color: #c2410c;
+}
+
+/* Rincian per tanggal */
+.income-recap {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.income-recap-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.income-recap-head h3 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.income-recap-head > span {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.income-daily-list {
+  display: grid;
+  gap: 7px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.income-day-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  padding: 11px 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+
+.income-day-row > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.income-day-row b {
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.income-day-row small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.income-day-row > strong {
+  flex-shrink: 0;
+  color: #047857;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.income-empty,
+.income-notice {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.income-notice {
+  margin: 12px 0 0;
+  padding: 10px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+}
+
+/* HP */
+@media screen and (max-width: 768px) {
+  .income-panel {
+    padding: 14px;
+  }
+
+  .income-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .income-summary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .income-filter-field input,
+  .income-filter-field select {
+    font-size: 16px;
+  }
+
+  .income-card {
+    padding: 13px;
+  }
+
+  .income-card strong {
+    font-size: 22px;
+  }
+
+  .income-day-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .income-day-row > strong {
+    font-size: 16px;
+  }
+}
