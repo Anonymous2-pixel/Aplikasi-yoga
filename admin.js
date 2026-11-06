@@ -567,59 +567,56 @@
       return amount;
     }
 
-    function renderIncomeDashboard() {
-      const rangeStartInput = $("#incomeRangeStart");
-      const rangeEndInput = $("#incomeRangeEnd");
+  function renderIncomeDashboard() {
+  const rangeStartInput = $("#incomeRangeStart");
+  const rangeEndInput = $("#incomeRangeEnd");
 
-      if (!rangeStartInput || !rangeEndInput) {
-        return;
-      }
+  if (!rangeStartInput || !rangeEndInput) {
+    return;
+  }
 
-      const today = jakartaDateKey();
+  const today = jakartaDateKey();
 
-      if (!rangeStartInput.value) {
-        rangeStartInput.value = today;
-      }
+  if (!rangeStartInput.value) {
+    rangeStartInput.value = today;
+  }
 
-      if (!rangeEndInput.value) {
-        rangeEndInput.value = today;
-      }
+  if (!rangeEndInput.value) {
+    rangeEndInput.value = today;
+  }
 
-      // Jika tanggal awal dan akhir tertukar,
-      // sistem otomatis mengurutkannya.
-      let rangeStart = rangeStartInput.value;
-      let rangeEnd = rangeEndInput.value;
+  let rangeStart = rangeStartInput.value;
+  let rangeEnd = rangeEndInput.value;
 
-      if (rangeStart > rangeEnd) {
-        [rangeStart, rangeEnd] = [rangeEnd, rangeStart];
-      }
+  if (rangeStart > rangeEnd) {
+    [rangeStart, rangeEnd] = [rangeEnd, rangeStart];
+  }
 
-      let rangeTotal = 0;
-      let rangeCount = 0;
+  let rangeTotal = 0;
+  let rangeCount = 0;
 
-      orders.forEach(order => {
-        const amount = getRecordedPaymentTotal(order);
+  orders.forEach(order => {
+    const amount = getRecordedPaymentTotal(order);
 
-        if (amount === null) return;
+    if (amount === null) return;
 
-        const dateKey = orderDateKey(order.createdAt);
+    const dateKey = orderDateKey(order.createdAt);
 
-        if (!dateKey) return;
+    if (!dateKey) return;
 
-        // Tanggal awal dan akhir ikut dihitung.
-        if (dateKey >= rangeStart && dateKey <= rangeEnd) {
-          rangeTotal += amount;
-          rangeCount += 1;
-        }
-      });
-
-      setText(
-        "#incomeRangeLabel",
-        `Pemasukan ${displayIncomeDate(rangeStart)} — ${displayIncomeDate(rangeEnd)}`
-      );
-
-      setText("#incomeRangeTotal", rupiah(rangeTotal));
+    if (dateKey >= rangeStart && dateKey <= rangeEnd) {
+      rangeTotal += amount;
+      rangeCount += 1;
     }
+  });
+
+  setText(
+    "#incomeRangeLabel",
+    `Pemasukan ${displayIncomeDate(rangeStart)} — ${displayIncomeDate(rangeEnd)}`
+  );
+
+  setText("#incomeRangeTotal", rupiah(rangeTotal));
+}
 
     $("#incomeRangeStart")?.addEventListener(
       "change",
