@@ -2046,137 +2046,204 @@ button {
   }
 }
 /* ===================================================
-   DASHBOARD PEMASUKAN
+   DASHBOARD PEMASUKAN - TAMPILAN RAPI
    =================================================== */
 .income-panel {
   min-width: 0;
-  padding: 24px;
+  padding: 22px;
   background: var(--white);
   border: 1px solid var(--line);
   border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(16, 35, 60, 0.04);
 }
 
 .income-eyebrow {
+  display: block;
   color: var(--blue);
   font-family: var(--mono);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
+  line-height: 1.6;
 }
 
 .income-heading h2 {
-  margin: 8px 0;
+  margin: 6px 0 4px;
   color: var(--navy);
-  font-size: 23px;
+  font-size: 22px;
+  line-height: 1.4;
 }
 
 .income-heading p {
   margin: 0;
   color: var(--muted);
   font-size: 12px;
-  line-height: 1.8;
+  line-height: 1.7;
 }
 
-.income-filters {
+.income-controls {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin: 20px 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+  padding: 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
 }
 
 .income-filter-field {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  gap: 7px;
+  gap: 6px;
 }
 
 .income-filter-field label {
   color: var(--muted);
-  font-size: 11px;
+  font-family: var(--mono);
+  font-size: 9px;
   font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
 }
 
-.income-filter-field input {
+.income-filter-field input,
+.income-filter-field select {
   width: 100%;
   min-width: 0;
-  min-height: 46px;
-  padding: 10px 12px;
-  background: var(--paper);
+  min-height: 44px;
+  padding: 9px 11px;
+  background: var(--white);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 9px;
   color: var(--navy);
   font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
-.income-metrics {
+.income-filter-field input:focus,
+.income-filter-field select:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.income-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
+  margin-top: 14px;
 }
 
-.income-metric {
+.income-card {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  gap: 10px;
-  padding: 18px;
-  background: #f0f7ff;
-  border: 1px solid #dbeafe;
+  gap: 8px;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
   border-radius: 12px;
 }
 
-.income-metric > span {
-  color: #475569;
-  font-size: 11px;
-  line-height: 1.7;
+.income-card-head {
+  min-width: 0;
 }
 
-.income-metric strong {
-  color: var(--navy);
-  font-size: clamp(19px, 2.2vw, 28px);
-  line-height: 1.4;
+.income-card-head span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.6;
   overflow-wrap: anywhere;
 }
 
-.income-metric small {
-  color: var(--muted);
-  font-size: 11px;
+.income-card strong {
+  display: block;
+  color: var(--navy);
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
-.income-recap-heading {
+.income-card small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.income-card-day {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.income-card-month {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.income-card-year {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.income-card-day strong {
+  color: #1d4ed8;
+}
+
+.income-card-month strong {
+  color: #047857;
+}
+
+.income-card-year strong {
+  color: #c2410c;
+}
+
+.income-recap {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.income-recap-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin: 24px 0 12px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
-.income-recap-heading h3 {
+.income-recap-head h3 {
   margin: 0;
   color: var(--navy);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-.income-recap-heading > span {
+.income-recap-head > span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
+  line-height: 1.5;
 }
 
 .income-daily-list {
   display: grid;
   gap: 8px;
-  max-height: 380px;
+  max-height: 320px;
+  padding-right: 4px;
   overflow-y: auto;
 }
 
 .income-day-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 14px;
-  padding: 14px;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -2186,36 +2253,40 @@ button {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  gap: 5px;
+  gap: 3px;
 }
 
 .income-day-row b {
   color: var(--navy);
   font-size: 12px;
-  line-height: 1.6;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .income-day-row small {
   color: var(--muted);
   font-size: 10px;
+  line-height: 1.5;
 }
 
 .income-day-row > strong {
   flex-shrink: 0;
   color: #047857;
   font-size: 14px;
+  line-height: 1.4;
 }
 
 .income-empty,
 .income-notice {
   color: var(--muted);
   font-size: 11px;
-  line-height: 1.8;
+  line-height: 1.7;
 }
 
 .income-notice {
-  margin: 16px 0 0;
-  padding: 12px;
+  margin: 14px 0 0;
+  padding: 11px 12px;
   background: #fffbeb;
   border: 1px solid #fde68a;
   border-radius: 10px;
@@ -2226,27 +2297,36 @@ button {
     padding: 16px;
   }
 
-  .income-metrics {
+  .income-controls {
     grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
   }
 
-  .income-filter-field input {
+  .income-summary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .income-filter-field input,
+  .income-filter-field select {
     font-size: 16px;
   }
 
-  .income-metric strong {
-    font-size: 25px;
+  .income-card {
+    padding: 14px;
+  }
+
+  .income-card strong {
+    font-size: 24px;
   }
 
   .income-day-row {
     align-items: flex-start;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
-}
 
-@media screen and (max-width: 380px) {
-  .income-filters {
-    grid-template-columns: minmax(0, 1fr);
+  .income-day-row > strong {
+    font-size: 16px;
   }
 }
