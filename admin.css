@@ -2419,7 +2419,7 @@ button {
 /* Tiga kartu pemasukan */
 .income-summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin-top: 12px;
 }
@@ -2617,5 +2617,20 @@ button {
 
   .income-day-row > strong {
     font-size: 16px;
+  }
+}
+/* Kartu pemasukan rentang tanggal */
+.income-card-range {
+  background: #f5f3ff;
+  border-color: #ddd6fe;
+}
+
+.income-card-range strong {
+  color: #6d28d9;
+}
+
+@media screen and (max-width: 768px) {
+  .income-summary {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
