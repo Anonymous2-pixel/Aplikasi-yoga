@@ -161,44 +161,44 @@
         </div>
       </section>
 
-     <!-- ===================================================
-     DASHBOARD PEMASUKAN ADMIN
-     =================================================== -->
-<section class="income-panel" aria-labelledby="incomeTitle">
-  <div class="income-heading">
-    <div>
-      <span class="income-eyebrow">REKAP KASIR</span>
-      <h2 id="incomeTitle">Pemasukan Laundry</h2>
-      <p>
-        Pilih rentang tanggal untuk melihat total tagihan lunas.
-      </p>
-    </div>
-  </div>
+      <!-- ===================================================
+           DASHBOARD PEMASUKAN ADMIN
+           =================================================== -->
+      <section class="income-panel" aria-labelledby="incomeTitle">
+        <div class="income-heading">
+          <div>
+            <span class="income-eyebrow">REKAP KASIR</span>
+            <h2 id="incomeTitle">Pemasukan Laundry</h2>
+            <p>
+              Pilih rentang tanggal untuk melihat total tagihan lunas.
+            </p>
+          </div>
+        </div>
 
-  <div class="income-controls">
-    <div class="income-filter-field">
-      <label for="incomeRangeStart">Dari tanggal</label>
-      <input type="date" id="incomeRangeStart">
-    </div>
+        <div class="income-controls">
+          <div class="income-filter-field">
+            <label for="incomeRangeStart">Dari tanggal</label>
+            <input type="date" id="incomeRangeStart">
+          </div>
 
-    <div class="income-filter-field">
-      <label for="incomeRangeEnd">Sampai tanggal</label>
-      <input type="date" id="incomeRangeEnd">
-    </div>
-  </div>
+          <div class="income-filter-field">
+            <label for="incomeRangeEnd">Sampai tanggal</label>
+            <input type="date" id="incomeRangeEnd">
+          </div>
+        </div>
 
-  <div class="income-summary">
-    <article class="income-card income-card-range">
-      <div class="income-card-head">
-        <span id="incomeRangeLabel">
-          Pemasukan rentang tanggal
-        </span>
-      </div>
+        <div class="income-summary">
+          <article class="income-card income-card-range">
+            <div class="income-card-head">
+              <span id="incomeRangeLabel">
+                Pemasukan rentang tanggal
+              </span>
+            </div>
 
-      <strong id="incomeRangeTotal">Rp0</strong>
-    </article>
-  </div>
-</section>
+            <strong id="incomeRangeTotal">Rp0</strong>
+          </article>
+        </div>
+      </section>
 
       <!-- PENCARIAN DAN FILTER -->
       <section class="toolbar" aria-label="Pencarian dan aksi pesanan">
@@ -361,6 +361,24 @@
         id="manualOrderForm"
         class="admin-modal-body form-grid"
       >
+        <!-- TANGGAL PESANAN -->
+        <div class="form-group full-width">
+          <label for="manualOrderDate">
+            Tanggal Pesanan *
+          </label>
+
+          <input
+            type="date"
+            id="manualOrderDate"
+            required
+          >
+
+          <small class="cashier-help">
+            Gunakan tanggal pesanan sebenarnya. Untuk pesanan baru,
+            biarkan tanggal hari ini.
+          </small>
+        </div>
+
         <!-- NAMA -->
         <div class="form-group">
           <label for="manualName">Nama Pelanggan *</label>
@@ -546,7 +564,7 @@
       </form>
     </div>
   </div>
- 
+
   <script src="admin.js"></script>
 </body>
 </html>
