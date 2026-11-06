@@ -2649,3 +2649,83 @@ button {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.income-recap-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.income-pdf-area {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #incomePdfArea,
+  #incomePdfArea * {
+    visibility: visible;
+  }
+
+  #incomePdfArea {
+    display: block !important;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 18px;
+    background: #fff;
+    color: #000;
+  }
+
+  .income-pdf-title {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .income-pdf-sub {
+    margin: 0 0 14px;
+    font-size: 11px;
+  }
+
+  .income-pdf-section {
+    margin-bottom: 16px;
+    page-break-inside: avoid;
+  }
+
+  .income-pdf-section h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    text-transform: uppercase;
+  }
+
+  .income-pdf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .income-pdf-table th,
+  .income-pdf-table td {
+    padding: 7px 8px;
+    border: 1px solid #999;
+    text-align: left;
+  }
+
+  .income-pdf-table th {
+    background: #eee;
+  }
+
+  .income-pdf-table td:last-child,
+  .income-pdf-table th:last-child {
+    text-align: right;
+  }
+
+  .income-pdf-total td {
+    font-weight: 800;
+  }
+}
