@@ -190,11 +190,6 @@
             <label for="incomeMonth">Bulan</label>
             <input type="month" id="incomeMonth">
           </div>
-
-          <div class="income-filter-field">
-            <label for="incomeYear">Tahun</label>
-            <select id="incomeYear"></select>
-          </div>
         </div>
 
         <div class="income-summary">
@@ -217,22 +212,22 @@
 
             <strong id="incomeMonthTotal">Rp0</strong>
           </article>
-
-          <article class="income-card income-card-year">
-            <div class="income-card-head">
-              <span id="incomeYearLabel">
-                Total pemasukan tahun pilihan
-              </span>
-            </div>
-
-            <strong id="incomeYearTotal">Rp0</strong>
-          </article>
         </div>
 
         <div class="income-recap">
           <div class="income-recap-head">
-            <h3>Rincian per tanggal</h3>
-            <span id="incomeRecapPeriod"></span>
+            <div>
+              <h3>Rincian per tanggal</h3>
+              <span id="incomeRecapPeriod"></span>
+            </div>
+
+            <button
+              type="button"
+              id="btnDownloadIncomePdf"
+              class="btn-primary"
+            >
+              ⬇ Unduh Rekap PDF
+            </button>
           </div>
 
           <div
@@ -590,6 +585,13 @@
       </form>
     </div>
   </div>
+
+  <!-- AREA REKAP PDF -->
+  <div
+    id="incomePdfArea"
+    class="income-pdf-area"
+    aria-hidden="true"
+  ></div>
 
   <script src="admin.js"></script>
 </body>
