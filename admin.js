@@ -577,10 +577,9 @@
       return amount;
     }
 
-   function renderIncomeDashboard() {
+ function renderIncomeDashboard() {
   const dateInput = $("#incomeDate");
   const monthInput = $("#incomeMonth");
-  const yearInput = $("#incomeYear");
   const rangeStartInput = $("#incomeRangeStart");
   const rangeEndInput = $("#incomeRangeEnd");
   const dailyList = $("#incomeDailyList");
@@ -588,7 +587,6 @@
   if (
     !dateInput ||
     !monthInput ||
-    !yearInput ||
     !rangeStartInput ||
     !rangeEndInput ||
     !dailyList
@@ -615,50 +613,8 @@
   const selectedDate = dateInput.value;
   const selectedMonth = monthInput.value;
 
-  // Buat daftar tahun dari tanggal pesanan.
-  const years = Array.from(
-    new Set(
-      orders
-        .map(order =>
-          orderDateKey(order.createdAt).slice(0, 4)
-        )
-        .filter(Boolean)
-    )
-  ).sort();
-
-  const currentYear = Number(today.slice(0, 4));
-
-  // Tampilkan 10 tahun ke depan.
-  for (
-    let year = currentYear;
-    year <= currentYear + 9;
-    year++
-  ) {
-    const yearText = String(year);
-
-    if (!years.includes(yearText)) {
-      years.push(yearText);
-    }
-  }
-
-  years.sort();
-
-  const previousYear = yearInput.value;
-
-  yearInput.innerHTML = years.map(year => `
-    <option value="${year}">${year}</option>
-  `).join("");
-
-  if (years.includes(previousYear)) {
-    yearInput.value = previousYear;
-  } else {
-    yearInput.value = String(currentYear);
-  }
-
-  const selectedYear = yearInput.value;
-
-  // Rentang tanggal. Jika tanggal awal dan akhir
-  // tertukar, sistem otomatis mengurutkannya.
+  // Jika tanggal awal dan akhir tertukar,
+  // sistem otomatis mengurutkannya.
   let rangeStart = rangeStartInput.value;
   let rangeEnd = rangeEndInput.value;
 
@@ -668,7 +624,6 @@
 
   let dayTotal = 0;
   let monthTotal = 0;
-  let yearTotal = 0;
   let rangeTotal = 0;
 
   let withoutPayment = 0;
@@ -690,12 +645,6 @@
     if (!dateKey) {
       invalidDateCount += 1;
       return;
-    }
-
-    const orderYear = dateKey.slice(0, 4);
-
-    if (orderYear === selectedYear) {
-      yearTotal += amount;
     }
 
     if (order.status === "Dibatalkan") {
@@ -720,7 +669,7 @@
       daily.set(dateKey, entry);
     }
 
-    // Rentang tanggal: tanggal awal dan akhir ikut dihitung.
+    // Rentang tanggal: awal dan akhir ikut dihitung.
     if (
       dateKey >= rangeStart &&
       dateKey <= rangeEnd
@@ -742,13 +691,6 @@
   );
 
   setText("#incomeMonthTotal", rupiah(monthTotal));
-
-  setText(
-    "#incomeYearLabel",
-    `Total pemasukan tahun ${selectedYear}`
-  );
-
-  setText("#incomeYearTotal", rupiah(yearTotal));
 
   setText(
     "#incomeRangeLabel",
@@ -809,31 +751,6 @@
 
   setText("#incomeNotice", notices.join(" "));
 }
-
-$("#incomeDate")?.addEventListener(
-  "change",
-  renderIncomeDashboard
-);
-
-$("#incomeMonth")?.addEventListener(
-  "change",
-  renderIncomeDashboard
-);
-
-$("#incomeYear")?.addEventListener(
-  "change",
-  renderIncomeDashboard
-);
-
-$("#incomeRangeStart")?.addEventListener(
-  "change",
-  renderIncomeDashboard
-);
-
-$("#incomeRangeEnd")?.addEventListener(
-  "change",
-  renderIncomeDashboard
-);
     // ===================================================
     // DASHBOARD / TABLE
     // ===================================================
