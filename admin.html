@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Yoga Laundry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- PIN Login Screen Overlay -->
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+      <div class="login-header">
+        <span class="brand-mark">Y</span>
+        <h2>YOGA <b>LAUNDRY</b></h2>
+        <p>Akses Khusus Admin &amp; Staff Toko</p>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <label for="adminPin">Masukkan PIN Admin:</label>
+        <div class="pin-input-wrap">
+         <input
+  type="password"
+  id="adminPin"
+  placeholder="Masukkan PIN "
+  autocomplete="current-password"
+  required
+  autofocus
+>
+          <button type="submit" class="btn-login">MASUK ➔</button>
+        </div>
+       <p class="login-hint">
+  Gunakan PIN admin yang telah diatur oleh pemilik toko.
+</p>
+        <div id="loginError" class="login-error" style="display: none;">PIN salah, silakan coba lagi!</div>
+      </form>
+
+      <div class="login-footer">
+        <a href="index.html">← Kembali ke Website Utama</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Main Dashboard Container -->
+  <div id="adminApp" class="admin-wrapper" style="display: none;">
+    <!-- Topbar -->
+    <header class="admin-header">
+      <div class="admin-brand">
+        <span class="brand-mark">Y</span>
+        <div>
+          <h1>YOGA <b>LAUNDRY</b></h1>
+          <span class="admin-badge">PANEL KELOLA PESANAN</span>
+        </div>
+      </div>
+
+      <div class="admin-header-actions">
+        <div class="live-clock" id="liveClock">--:--:-- WIB</div>
+        <a href="index.html" class="btn-secondary" target="_blank">Lihat Website ↗</a>
+        <button id="btnLogout" class="btn-danger">Keluar</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <!-- Metric Cards -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-label">TOTAL PESANAN</span>
+          <div class="metric-val" id="metricTotal">0</div>
+          <span class="metric-sub">Semua riwayat pesanan</span>
+        </div>
+        <div class="metric-card card-warning">
+          <span class="metric-label">PERLU DIJEMPUT</span>
+          <div class="metric-val" id="metricPending">0</div>
+          <span class="metric-sub">Menunggu penjemputan</span>
+        </div>
+        <div class="metric-card card-info">
+          <span class="metric-label">SEDANG DIPROSES</span>
+          <div class="metric-val" id="metricProcess">0</div>
+          <span class="metric-sub">Cuci / Setrika / Siap antar</span>
+        </div>
+        <div class="metric-card card-success">
+          <span class="metric-label">PESANAN SELESAI</span>
+          <div class="metric-val" id="metricCompleted">0</div>
+          <span class="metric-sub">Sudah diterima pelanggan</span>
+        </div>
+      </section>
+
+      <!-- Action & Filter Bar -->
+      <section class="toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Cari No. Resi, Nama Pelanggan, atau No. WhatsApp..."
+          >
+        </div>
+
+        <div class="filter-group">
+          <label for="filterStatus">Status:</label>
+          <select id="filterStatus">
+            <option value="ALL">Semua Status</option>
+            <option value="Menunggu Penjemputan">Menunggu Penjemputan</option>
+            <option value="Sedang Dijemput">Sedang Dijemput</option>
+            <option value="Sedang Dicuci">Sedang Dicuci</option>
+            <option value="Sedang Disetrika">Sedang Disetrika</option>
+            <option value="Siap Diantar">Siap Diantar</option>
+            <option value="Selesai">Selesai</option>
+            <option value="Dibatalkan">Dibatalkan</option>
+          </select>
+
+          <button id="btnNewManualOrder" class="btn-primary">+ Tambah Pesanan Manual</button>
+          <button id="btnRefreshData" class="btn-refresh" title="Muat Ulang Data">⟳</button>
+        </div>
+      </section>
+
+      <!-- Orders Table Card -->
+      <section class="table-card">
+        <div class="table-responsive">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>NO. RESI</th>
+                <th>WAKTU MASUK</th>
+                <th>PELANGGAN</th>
+                <th>ALAMAT JEMPUT</th>
+                <th>LAYANAN &amp; ESTIMASI</th>
+                <th>CATATAN</th>
+                <th>STATUS PESANAN</th>
+                <th>AKSI</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-icon">🧺</div>
+          <h3>Belum Ada Pesanan Masuk</h3>
+          <p>Pesanan yang dibuat oleh pelanggan melalui website akan otomatis tampil di sini secara real-time.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Struk Admin -->
+  <div id="receiptModal" class="admin-modal" style="display: none;">
+    <div class="admin-modal-dialog">
+      <div class="admin-modal-header">
+        <h3>STRUK RESMI YOGA LAUNDRY</h3>
+        <button class="btn-close-modal" id="btnCloseReceipt">&times;</button>
+      </div>
+      <div class="admin-modal-body" id="receiptPrintArea">
+        <!-- Render Struk Content -->
+      </div>
+      <div class="admin-modal-footer">
+        <button id="btnPrintReceipt" class="btn-primary">🖨 Cetak Struk</button>
+        <button id="btnCloseReceipt2" class="btn-secondary">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Pesanan Manual -->
+  <div id="manualOrderModal" class="admin-modal" style="display: none;">
+    <div class="admin-modal-dialog">
+      <div class="admin-modal-header">
+        <h3>+ Input Pesanan Masuk (Manual / Toko)</h3>
+        <button class="btn-close-modal" id="btnCloseManual">&times;</button>
+      </div>
+      <form id="manualOrderForm" class="admin-modal-body form-grid">
+        <div class="form-group">
+          <label>Nama Pelanggan *</label>
+          <input type="text" id="manualName" required placeholder="Contoh: Yoga Pratama">
+        </div>
+
+        <div class="form-group">
+          <label>No. WhatsApp *</label>
+          <input type="tel" id="manualPhone" required placeholder="08xxxxxxxxxx">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Alamat Penjemputan / Antar *</label>
+          <textarea id="manualAddress" rows="2" required placeholder="Jalan, No Rumah, RT/RW, Patokan"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Layanan *</label>
+          <select id="manualService" required>
+            <optgroup label="── Kategori: Reguler ──">
+              <option value="Cuci Lipat (Reguler)">Cuci Lipat (Rp5.000/kg)</option>
+              <option value="Cuci Setrika (Reguler)" selected>Cuci Setrika (Rp7.000/kg)</option>
+              <option value="Setrika Saja (Reguler)">Setrika Saja (Rp5.000/kg)</option>
+            </optgroup>
+            <optgroup label="── Kategori: Express 24 Jam ──">
+              <option value="Cuci Lipat (Express 24 Jam)">Cuci Lipat 24 Jam (Rp7.000/kg)</option>
+              <option value="Cuci Setrika (Express 24 Jam)">Cuci Setrika 24 Jam (Rp10.000/kg)</option>
+              <option value="Setrika Saja (Express 24 Jam)">Setrika Saja 24 Jam (Rp7.000/kg)</option>
+            </optgroup>
+            <optgroup label="── Kategori: Express 6 Jam Kerja ──">
+              <option value="Cuci Lipat (Express 6 Jam)">Cuci Lipat 6 Jam (Rp10.000/kg)</option>
+              <option value="Cuci Setrika (Express 6 Jam)">Cuci Setrika 6 Jam (Rp14.000/kg)</option>
+              <option value="Setrika Saja (Express 6 Jam)">Setrika Saja 6 Jam (Rp10.000/kg)</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Estimasi Berat / Jumlah</label>
+          <input type="text" id="manualWeight" placeholder="Contoh: 4 kg atau 1 Bed Cover">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Catatan Khusus</label>
+          <input type="text" id="manualNote" placeholder="Misal: Pisahkan pakaian putih, parfum ocean fresh">
+        </div>
+
+        <div class="admin-modal-footer full-width">
+          <button type="submit" class="btn-primary">Simpan Pesanan &amp; Buat Struk</button>
+          <button type="button" class="btn-secondary" id="btnCancelManual">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
+
