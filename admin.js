@@ -482,262 +482,329 @@
 
       return "";
     }
+
     // ===================================================
-// DASHBOARD PEMASUKAN
-// ===================================================
-function jakartaDateKey() {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Jakarta",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).formatToParts(new Date());
+    // DASHBOARD PEMASUKAN
+    // ===================================================
+    function jakartaDateKey() {
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Jakarta",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(new Date());
 
-  const get = type =>
-    parts.find(part => part.type === type)?.value;
+      const get = type =>
+        parts.find(part => part.type === type)?.value;
 
-  return `${get("year")}-${get("month")}-${get("day")}`;
-}
-
-function orderDateKey(createdAt) {
-  // Format pesanan yang dibuat kode sekarang:
-  // dd/mm/yyyy, HH.mm WIB
-  const match = String(createdAt || "")
-    .trim()
-    .match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\D|$)/);
-
-  if (!match) return "";
-
-  const day = Number(match[1]);
-  const month = Number(match[2]);
-  const year = Number(match[3]);
-
-  const date = new Date(Date.UTC(year, month - 1, day));
-
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month - 1 ||
-    date.getUTCDate() !== day
-  ) {
-    return "";
-  }
-
-  return (
-    `${year}-` +
-    `${String(month).padStart(2, "0")}-` +
-    String(day).padStart(2, "0")
-  );
-}
-
-function displayIncomeDate(key) {
-  const [year, month, day] = key.split("-").map(Number);
-
-  return new Intl.DateTimeFormat("id-ID", {
-    timeZone: "UTC",
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  }).format(new Date(Date.UTC(year, month - 1, day)));
-}
-
-function displayIncomeMonth(key) {
-  const [year, month] = key.split("-").map(Number);
-
-  return new Intl.DateTimeFormat("id-ID", {
-    timeZone: "UTC",
-    month: "long",
-    year: "numeric"
-  }).format(new Date(Date.UTC(year, month - 1, 1)));
-}
-
-function getRecordedPaymentTotal(order) {
-  const payment = splitPaymentNote(order.note);
-
-  // Hanya catatan kasir dengan penanda yang dibuat
-  // oleh admin.js terbaru.
-  if (!payment.paymentText) return null;
-
-  const text = payment.paymentText;
-
-  if (!/^Status pembayaran:\s*LUNAS\s*$/im.test(text)) {
-    return null;
-  }
-
-  // Ambil total tagihan, BUKAN uang diterima.
-  const match = text.match(
-    /^Total tagihan:\s*Rp\s*([0-9.]+)\s*$/im
-  );
-
-  if (!match) return null;
-
-  const digits = match[1].replace(/\./g, "");
-  const amount = Number(digits);
-
-  if (!Number.isSafeInteger(amount) || amount <= 0) {
-    return null;
-  }
-
-  return amount;
-}
-
-function renderIncomeDashboard() {
-  const dateInput = $("#incomeDate");
-  const monthInput = $("#incomeMonth");
-  const dailyList = $("#incomeDailyList");
-
-  if (!dateInput || !monthInput || !dailyList) return;
-
-  const today = jakartaDateKey();
-
-  if (!dateInput.value) dateInput.value = today;
-  if (!monthInput.value) {
-    monthInput.value = today.slice(0, 7);
-  }
-
-  const selectedDate = dateInput.value;
-  const selectedMonth = monthInput.value;
-
-  let dayTotal = 0;
-  let dayCount = 0;
-
-  let monthTotal = 0;
-  let monthCount = 0;
-
-  let allTotal = 0;
-  let allCount = 0;
-
-  let withoutPayment = 0;
-  let invalidDateCount = 0;
-  let cancelledPaidCount = 0;
-
-  const daily = new Map();
-
-  orders.forEach(order => {
-    const amount = getRecordedPaymentTotal(order);
-
-    if (amount === null) {
-      withoutPayment += 1;
-      return;
+      return `${get("year")}-${get("month")}-${get("day")}`;
     }
 
-    allTotal += amount;
-    allCount += 1;
+    function orderDateKey(createdAt) {
+      const match = String(createdAt || "")
+        .trim()
+        .match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\D|$)/);
 
-    if (order.status === "Dibatalkan") {
-      cancelledPaidCount += 1;
+      if (!match) return "";
+
+      const day = Number(match[1]);
+      const month = Number(match[2]);
+      const year = Number(match[3]);
+
+      const date = new Date(Date.UTC(year, month - 1, day));
+
+      if (
+        date.getUTCFullYear() !== year ||
+        date.getUTCMonth() !== month - 1 ||
+        date.getUTCDate() !== day
+      ) {
+        return "";
+      }
+
+      return (
+        `${year}-` +
+        `${String(month).padStart(2, "0")}-` +
+        String(day).padStart(2, "0")
+      );
     }
 
-    const dateKey = orderDateKey(order.createdAt);
+    function displayIncomeDate(key) {
+      const [year, month, day] = key.split("-").map(Number);
 
-    if (!dateKey) {
-      invalidDateCount += 1;
-      return;
+      return new Intl.DateTimeFormat("id-ID", {
+        timeZone: "UTC",
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).format(new Date(Date.UTC(year, month - 1, day)));
     }
 
-    if (dateKey === selectedDate) {
-      dayTotal += amount;
-      dayCount += 1;
+    function displayIncomeMonth(key) {
+      const [year, month] = key.split("-").map(Number);
+
+      return new Intl.DateTimeFormat("id-ID", {
+        timeZone: "UTC",
+        month: "long",
+        year: "numeric"
+      }).format(new Date(Date.UTC(year, month - 1, 1)));
     }
 
-    if (dateKey.slice(0, 7) === selectedMonth) {
-      monthTotal += amount;
-      monthCount += 1;
+    function getRecordedPaymentTotal(order) {
+      const payment = splitPaymentNote(order.note);
 
-      const entry = daily.get(dateKey) || {
-        total: 0,
-        count: 0
-      };
+      if (!payment.paymentText) return null;
 
-      entry.total += amount;
-      entry.count += 1;
+      const text = payment.paymentText;
 
-      daily.set(dateKey, entry);
+      if (!/^Status pembayaran:\s*LUNAS\s*$/im.test(text)) {
+        return null;
+      }
+
+      const match = text.match(
+        /^Total tagihan:\s*Rp\s*([0-9.]+)\s*$/im
+      );
+
+      if (!match) return null;
+
+      const digits = match[1].replace(/\./g, "");
+      const amount = Number(digits);
+
+      if (!Number.isSafeInteger(amount) || amount <= 0) {
+        return null;
+      }
+
+      return amount;
     }
-  });
 
-  setText(
-    "#incomeDayLabel",
-    displayIncomeDate(selectedDate)
-  );
+    function renderIncomeDashboard() {
+      const dateInput = $("#incomeDate");
+      const monthInput = $("#incomeMonth");
+      const yearInput = $("#incomeYear");
+      const dailyList = $("#incomeDailyList");
 
-  setText("#incomeDayTotal", rupiah(dayTotal));
-  setText("#incomeDayCount", `${dayCount} pesanan lunas`);
+      if (
+        !dateInput ||
+        !monthInput ||
+        !yearInput ||
+        !dailyList
+      ) {
+        return;
+      }
 
-  setText(
-    "#incomeMonthLabel",
-    displayIncomeMonth(selectedMonth)
-  );
+      const today = jakartaDateKey();
 
-  setText("#incomeMonthTotal", rupiah(monthTotal));
-  setText(
-    "#incomeMonthCount",
-    `${monthCount} pesanan lunas`
-  );
+      if (!dateInput.value) dateInput.value = today;
 
-  setText("#incomeAllTotal", rupiah(allTotal));
-  setText("#incomeAllCount", `${allCount} pesanan lunas`);
+      if (!monthInput.value) {
+        monthInput.value = today.slice(0, 7);
+      }
 
-  setText(
-    "#incomeRecapPeriod",
-    displayIncomeMonth(selectedMonth)
-  );
+      const selectedDate = dateInput.value;
+      const selectedMonth = monthInput.value;
 
-  const entries = Array.from(daily.entries())
-    .sort(([dateA], [dateB]) => dateB.localeCompare(dateA));
+      // Buat daftar tahun dari tanggal pesanan.
+      const years = Array.from(
+        new Set(
+          orders
+            .map(order =>
+              orderDateKey(order.createdAt).slice(0, 4)
+            )
+            .filter(Boolean)
+        )
+      ).sort();
 
-  dailyList.innerHTML = entries.length
-    ? entries.map(([dateKey, entry]) => `
-        <div class="income-day-row">
-          <div>
-            <b>${escapeHtml(displayIncomeDate(dateKey))}</b>
-            <small>${entry.count} pesanan lunas</small>
-          </div>
-          <strong>${escapeHtml(rupiah(entry.total))}</strong>
-        </div>
-      `).join("")
-    : `
-        <p class="income-empty">
-          Belum ada pembayaran kasir tercatat pada bulan ini.
-        </p>
-      `;
+      const currentYear = today.slice(0, 4);
 
-  const notices = [
-    "Rekap memakai tanggal pembuatan pesanan, bukan tanggal pembayaran terpisah.",
-    `${withoutPayment} pesanan tidak dihitung karena tidak memiliki catatan pembayaran kasir yang dapat dibaca.`,
-    "Akumulasi mengikuti pesanan yang masih ada di database; data yang dihapus tidak ikut dihitung."
-  ];
+      if (!years.includes(currentYear)) {
+        years.push(currentYear);
+        years.sort();
+      }
 
-  if (invalidDateCount) {
-    notices.push(
-      `${invalidDateCount} pesanan lunas memiliki tanggal yang tidak terbaca: masuk akumulasi, tetapi tidak masuk rekap harian/bulanan.`
+      const previousYear = yearInput.value;
+
+      yearInput.innerHTML = years.map(year => `
+        <option value="${year}">${year}</option>
+      `).join("");
+
+      if (years.includes(previousYear)) {
+        yearInput.value = previousYear;
+      } else {
+        yearInput.value = currentYear;
+      }
+
+      const selectedYear = yearInput.value;
+
+      let dayTotal = 0;
+      let dayCount = 0;
+
+      let monthTotal = 0;
+      let monthCount = 0;
+
+      let yearTotal = 0;
+      let yearCount = 0;
+
+      let withoutPayment = 0;
+      let invalidDateCount = 0;
+      let cancelledPaidCount = 0;
+
+      const daily = new Map();
+
+      orders.forEach(order => {
+        const amount = getRecordedPaymentTotal(order);
+
+        if (amount === null) {
+          withoutPayment += 1;
+          return;
+        }
+
+        const dateKey = orderDateKey(order.createdAt);
+
+        if (!dateKey) {
+          invalidDateCount += 1;
+          return;
+        }
+
+        const orderYear = dateKey.slice(0, 4);
+
+        // Pemasukan tahun dipilih, terpisah antar tahun.
+        if (orderYear === selectedYear) {
+          yearTotal += amount;
+          yearCount += 1;
+        }
+
+        if (order.status === "Dibatalkan") {
+          cancelledPaidCount += 1;
+        }
+
+        if (dateKey === selectedDate) {
+          dayTotal += amount;
+          dayCount += 1;
+        }
+
+        if (dateKey.slice(0, 7) === selectedMonth) {
+          monthTotal += amount;
+          monthCount += 1;
+
+          const entry = daily.get(dateKey) || {
+            total: 0,
+            count: 0
+          };
+
+          entry.total += amount;
+          entry.count += 1;
+
+          daily.set(dateKey, entry);
+        }
+      });
+
+      setText(
+        "#incomeDayLabel",
+        displayIncomeDate(selectedDate)
+      );
+
+      setText("#incomeDayTotal", rupiah(dayTotal));
+      setText(
+        "#incomeDayCount",
+        `${dayCount} pesanan lunas`
+      );
+
+      setText(
+        "#incomeMonthLabel",
+        displayIncomeMonth(selectedMonth)
+      );
+
+      setText("#incomeMonthTotal", rupiah(monthTotal));
+      setText(
+        "#incomeMonthCount",
+        `${monthCount} pesanan lunas`
+      );
+
+      setText(
+        "#incomeYearLabel",
+        `Pemasukan tahun ${selectedYear}`
+      );
+
+      setText("#incomeYearTotal", rupiah(yearTotal));
+      setText(
+        "#incomeYearCount",
+        `${yearCount} pesanan lunas`
+      );
+
+      setText(
+        "#incomeRecapPeriod",
+        displayIncomeMonth(selectedMonth)
+      );
+
+      const entries = Array.from(daily.entries())
+        .sort(([dateA], [dateB]) =>
+          dateB.localeCompare(dateA)
+        );
+
+      dailyList.innerHTML = entries.length
+        ? entries.map(([dateKey, entry]) => `
+            <div class="income-day-row">
+              <div>
+                <b>
+                  ${escapeHtml(
+                    displayIncomeDate(dateKey)
+                  )}
+                </b>
+                <small>${entry.count} pesanan lunas</small>
+              </div>
+              <strong>
+                ${escapeHtml(rupiah(entry.total))}
+              </strong>
+            </div>
+          `).join("")
+        : `
+            <p class="income-empty">
+              Belum ada pembayaran kasir tercatat pada bulan ini.
+            </p>
+          `;
+
+      const notices = [
+        "Rekap memakai tanggal pembuatan pesanan, bukan tanggal pembayaran terpisah.",
+        `${withoutPayment} pesanan tidak dihitung karena tidak memiliki catatan pembayaran kasir yang dapat dibaca.`,
+        "Pemasukan tahun dihitung terpisah untuk setiap tahun."
+      ];
+
+      if (invalidDateCount) {
+        notices.push(
+          `${invalidDateCount} pesanan lunas memiliki tanggal yang tidak terbaca, sehingga tidak masuk rekap harian, bulanan, maupun tahunan.`
+        );
+      }
+
+      if (cancelledPaidCount) {
+        notices.push(
+          `${cancelledPaidCount} pesanan berstatus Dibatalkan masih memiliki catatan lunas dan tetap dihitung. Refund belum dicatat oleh sistem.`
+        );
+      }
+
+      setText("#incomeNotice", notices.join(" "));
+    }
+
+    $("#incomeDate")?.addEventListener(
+      "change",
+      renderIncomeDashboard
     );
-  }
 
-  if (cancelledPaidCount) {
-    notices.push(
-      `${cancelledPaidCount} pesanan berstatus Dibatalkan masih memiliki catatan lunas dan tetap dihitung. Refund belum dicatat oleh sistem.`
+    $("#incomeMonth")?.addEventListener(
+      "change",
+      renderIncomeDashboard
     );
-  }
 
-  setText("#incomeNotice", notices.join(" "));
-}
-
-$("#incomeDate")?.addEventListener(
-  "change",
-  renderIncomeDashboard
-);
-
-$("#incomeMonth")?.addEventListener(
-  "change",
-  renderIncomeDashboard
-);
+    $("#incomeYear")?.addEventListener(
+      "change",
+      renderIncomeDashboard
+    );
 
     // ===================================================
     // DASHBOARD / TABLE
     // ===================================================
     function renderDashboard() {
-        renderIncomeDashboard();
+      renderIncomeDashboard();
+
       setText("#metricTotal", orders.length);
 
       setText(
@@ -835,35 +902,40 @@ $("#incomeMonth")?.addEventListener(
           : "";
 
         return `
-    <tr class="order-summary-card" data-id="${id}">
-           <td class="order-summary-cell">
-  <button
-    type="button"
-    class="order-summary-toggle"
-    data-action="toggle"
-    aria-expanded="false"
-  >
-    <span class="order-summary-top">
-      <span class="order-summary-id">#${id}</span>
-      <span class="order-summary-hint" aria-hidden="true"></span>
-    </span>
+          <tr class="order-summary-card" data-id="${id}">
+            <td class="order-summary-cell">
+              <button
+                type="button"
+                class="order-summary-toggle"
+                data-action="toggle"
+                aria-expanded="false"
+              >
+                <span class="order-summary-top">
+                  <span class="order-summary-id">#${id}</span>
+                  <span
+                    class="order-summary-hint"
+                    aria-hidden="true"
+                  ></span>
+                </span>
 
-    <span class="order-summary-name">
-      ${escapeHtml(order.name)}
-    </span>
+                <span class="order-summary-name">
+                  ${escapeHtml(order.name)}
+                </span>
 
-    <span class="order-summary-service">
-      ${escapeHtml(order.service)}
-      · ${escapeHtml(order.weight || "-")}
-    </span>
+                <span class="order-summary-service">
+                  ${escapeHtml(order.service)}
+                  · ${escapeHtml(order.weight || "-")}
+                </span>
 
-    <span
-      class="order-summary-status ${getStatusClass(order.status)}"
-    >
-      ${escapeHtml(order.status)}
-    </span>
-  </button>
-</td>
+                <span
+                  class="order-summary-status ${getStatusClass(
+                    order.status
+                  )}"
+                >
+                  ${escapeHtml(order.status)}
+                </span>
+              </button>
+            </td>
 
             <td style="font-size:11px;white-space:nowrap;">
               ${escapeHtml(order.createdAt)}
@@ -990,8 +1062,6 @@ $("#incomeMonth")?.addEventListener(
         await api(action, payload);
         success = true;
 
-        // Perbarui tampilan setelah server mengonfirmasi.
-        // Pengambilan ulang tetap dilakukan setelahnya.
         if (action === "createOrder") {
           const order = payload.order;
 
@@ -1073,8 +1143,6 @@ $("#incomeMonth")?.addEventListener(
       const payment = splitPaymentNote(order.note);
       const hasPayment = Boolean(payment.paymentText);
 
-      // Untuk transaksi kasir, nominal yang sudah dicatat
-      // tidak diubah lewat editor teks biasa.
       const fields = hasPayment
         ? [
             ["name", "Nama pelanggan"],
@@ -1155,43 +1223,44 @@ $("#incomeMonth")?.addEventListener(
     // ===================================================
     // TABLE EVENTS
     // ===================================================
-tableBody?.addEventListener("click", event => {
-  const button = event.target.closest(
-    "button[data-action]"
-  );
+    tableBody?.addEventListener("click", event => {
+      const button = event.target.closest(
+        "button[data-action]"
+      );
 
-  if (!button || button.disabled) return;
+      if (!button || button.disabled) return;
 
-  const row = button.closest("tr");
-  const id = row?.dataset.id;
+      const row = button.closest("tr");
+      const id = row?.dataset.id;
 
-  if (!id) return;
+      if (!id) return;
 
-  const action = button.dataset.action;
+      const action = button.dataset.action;
 
-  if (action === "toggle") {
-    const expanded = row.classList.toggle("is-expanded");
+      if (action === "toggle") {
+        const expanded =
+          row.classList.toggle("is-expanded");
 
-    button.setAttribute(
-      "aria-expanded",
-      String(expanded)
-    );
+        button.setAttribute(
+          "aria-expanded",
+          String(expanded)
+        );
 
-    return;
-  }
+        return;
+      }
 
-  if (action === "receipt") {
-    showReceiptModal(id);
-  }
+      if (action === "receipt") {
+        showReceiptModal(id);
+      }
 
-  if (action === "edit") {
-    editOrder(id);
-  }
+      if (action === "edit") {
+        editOrder(id);
+      }
 
-  if (action === "delete") {
-    deleteOrder(id);
-  }
-});
+      if (action === "delete") {
+        deleteOrder(id);
+      }
+    });
 
     tableBody?.addEventListener("change", event => {
       if (!event.target.matches(
@@ -1346,17 +1415,15 @@ tableBody?.addEventListener("click", event => {
       const weightInput = $("#manualWeight");
       const cashInput = $("#manualCash");
 
- const weight = weightInput?.valueAsNumber;
+      const weight = weightInput?.valueAsNumber;
 
-// Hapus titik ribuan sebelum dipakai menghitung.
-// Contoh: "120.000" menjadi angka 120000.
-const cashDigits = String(cashInput?.value || "")
-  .replace(/\./g, "")
-  .trim();
+      const cashDigits = String(cashInput?.value || "")
+        .replace(/\./g, "")
+        .trim();
 
-const cash = /^\d+$/.test(cashDigits)
-  ? Number(cashDigits)
-  : NaN;
+      const cash = /^\d+$/.test(cashDigits)
+        ? Number(cashDigits)
+        : NaN;
 
       const validWeight = Boolean(
         weightInput &&
@@ -1373,7 +1440,6 @@ const cash = /^\d+$/.test(cashDigits)
         cashInput.checkValidity()
       );
 
-      // Berat sampai dua angka desimal.
       const hundredths = validWeight
         ? Math.round(weight * 100)
         : 0;
@@ -1450,7 +1516,7 @@ const cash = /^\d+$/.test(cashDigits)
           "Masukkan berat lebih dari 0, maksimal dua angka desimal.";
       } else if (!bill.validCash) {
         message =
-           "Masukkan uang tunai yang diterima. Titik ribuan ditambahkan otomatis.";
+          "Masukkan uang tunai yang diterima. Titik ribuan ditambahkan otomatis.";
       } else if (short) {
         message =
           "Uang belum cukup. Pesanan belum bisa disimpan sebagai lunas.";
@@ -1475,43 +1541,41 @@ const cash = /^\d+$/.test(cashDigits)
       renderCashier
     );
 
-  $("#manualCash")?.addEventListener("input", event => {
-  const input = event.target;
+    $("#manualCash")?.addEventListener("input", event => {
+      const input = event.target;
 
-  // Hitung jumlah digit di kanan kursor agar posisi
-  // mengetik tetap nyaman ketika mengedit nominal.
-  const cursor = input.selectionStart ?? input.value.length;
+      const cursor =
+        input.selectionStart ?? input.value.length;
 
-  const digitsOnRight = input.value
-    .slice(cursor)
-    .replace(/\D/g, "")
-    .length;
+      const digitsOnRight = input.value
+        .slice(cursor)
+        .replace(/\D/g, "")
+        .length;
 
-  // Hanya angka rupiah bulat, tanpa simbol atau desimal.
-  const digits = input.value
-    .replace(/\D/g, "")
-    .replace(/^0+(?=\d)/, "");
+      const digits = input.value
+        .replace(/\D/g, "")
+        .replace(/^0+(?=\d)/, "");
 
-  input.value = digits.replace(
-    /\B(?=(\d{3})+(?!\d))/g,
-    "."
-  );
+      input.value = digits.replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        "."
+      );
 
-  let position = input.value.length;
-  let remaining = digitsOnRight;
+      let position = input.value.length;
+      let remaining = digitsOnRight;
 
-  while (position > 0 && remaining > 0) {
-    position -= 1;
+      while (position > 0 && remaining > 0) {
+        position -= 1;
 
-    if (/\d/.test(input.value[position])) {
-      remaining -= 1;
-    }
-  }
+        if (/\d/.test(input.value[position])) {
+          remaining -= 1;
+        }
+      }
 
-  input.setSelectionRange(position, position);
+      input.setSelectionRange(position, position);
 
-  renderCashier();
-});
+      renderCashier();
+    });
 
     manualOrderForm?.addEventListener("reset", () => {
       setTimeout(renderCashier, 0);
@@ -1533,8 +1597,6 @@ const cash = /^\d+$/.test(cashDigits)
           return;
         }
 
-        // Jika sebelumnya gagal, pertahankan isian dan ID
-        // agar tidak langsung membuat nomor pesanan baru.
         if (!pendingManualOrder) {
           manualOrderForm.reset();
           pendingManualSignature = "";
@@ -1617,7 +1679,6 @@ const cash = /^\d+$/.test(cashDigits)
           return;
         }
 
-        // Hindari penanda sistem masuk dari catatan biasa.
         if (customerNote.includes(PAYMENT_MARKER)) {
           alert(
             "Catatan pelanggan tidak boleh memakai penanda pembayaran sistem."
@@ -1661,8 +1722,6 @@ const cash = /^\d+$/.test(cashDigits)
           !pendingManualOrder ||
           signature !== pendingManualSignature
         ) {
-          // Jika isian berubah setelah kegagalan,
-          // minta pemeriksaan ID lama lebih dahulu.
           if (pendingManualOrder) {
             const proceed = confirm(
               "Isian berubah setelah percobaan penyimpanan sebelumnya.\n\n" +
@@ -1740,8 +1799,6 @@ const cash = /^\d+$/.test(cashDigits)
         manualOrderForm.reset();
         renderCashier();
 
-        // Fallback menampilkan order yang telah mendapat
-        // konfirmasi simpan jika pemuatan ulang gagal.
         showReceiptModal(order.id, order);
       }
     );
