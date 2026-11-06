@@ -1061,8 +1061,17 @@
       const weightInput = $("#manualWeight");
       const cashInput = $("#manualCash");
 
-      const weight = weightInput?.valueAsNumber;
-      const cash = cashInput?.valueAsNumber;
+ const weight = weightInput?.valueAsNumber;
+
+// Hapus titik ribuan sebelum dipakai menghitung.
+// Contoh: "120.000" menjadi angka 120000.
+const cashDigits = String(cashInput?.value || "")
+  .replace(/\./g, "")
+  .trim();
+
+const cash = /^\d+$/.test(cashDigits)
+  ? Number(cashDigits)
+  : NaN;
 
       const validWeight = Boolean(
         weightInput &&
@@ -1181,10 +1190,43 @@
       renderCashier
     );
 
-    $("#manualCash")?.addEventListener(
-      "input",
-      renderCashier
-    );
+  $("#manualCash")?.addEventListener("input", event => {
+  const input = event.target;
+
+  // Hitung jumlah digit di kanan kursor agar posisi
+  // mengetik tetap nyaman ketika mengedit nominal.
+  const cursor = input.selectionStart ?? input.value.length;
+
+  const digitsOnRight = input.value
+    .slice(cursor)
+    .replace(/\D/g, "")
+    .length;
+
+  // Hanya angka rupiah bulat, tanpa simbol atau desimal.
+  const digits = input.value
+    .replace(/\D/g, "")
+    .replace(/^0+(?=\d)/, "");
+
+  input.value = digits.replace(
+    /\B(?=(\d{3})+(?!\d))/g,
+    "."
+  );
+
+  let position = input.value.length;
+  let remaining = digitsOnRight;
+
+  while (position > 0 && remaining > 0) {
+    position -= 1;
+
+    if (/\d/.test(input.value[position])) {
+      remaining -= 1;
+    }
+  }
+
+  input.setSelectionRange(position, position);
+
+  renderCashier();
+});
 
     manualOrderForm?.addEventListener("reset", () => {
       setTimeout(renderCashier, 0);
