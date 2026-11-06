@@ -567,56 +567,56 @@
       return amount;
     }
 
-  function renderIncomeDashboard() {
-  const rangeStartInput = $("#incomeRangeStart");
-  const rangeEndInput = $("#incomeRangeEnd");
+    function renderIncomeDashboard() {
+      const rangeStartInput = $("#incomeRangeStart");
+      const rangeEndInput = $("#incomeRangeEnd");
 
-  if (!rangeStartInput || !rangeEndInput) {
-    return;
-  }
+      if (!rangeStartInput || !rangeEndInput) {
+        return;
+      }
 
-  const today = jakartaDateKey();
+      const today = jakartaDateKey();
 
-  if (!rangeStartInput.value) {
-    rangeStartInput.value = today;
-  }
+      if (!rangeStartInput.value) {
+        rangeStartInput.value = today;
+      }
 
-  if (!rangeEndInput.value) {
-    rangeEndInput.value = today;
-  }
+      if (!rangeEndInput.value) {
+        rangeEndInput.value = today;
+      }
 
-  let rangeStart = rangeStartInput.value;
-  let rangeEnd = rangeEndInput.value;
+      let rangeStart = rangeStartInput.value;
+      let rangeEnd = rangeEndInput.value;
 
-  if (rangeStart > rangeEnd) {
-    [rangeStart, rangeEnd] = [rangeEnd, rangeStart];
-  }
+      if (rangeStart > rangeEnd) {
+        [rangeStart, rangeEnd] = [rangeEnd, rangeStart];
+      }
 
-  let rangeTotal = 0;
-  let rangeCount = 0;
+      let rangeTotal = 0;
+      let rangeCount = 0;
 
-  orders.forEach(order => {
-    const amount = getRecordedPaymentTotal(order);
+      orders.forEach(order => {
+        const amount = getRecordedPaymentTotal(order);
 
-    if (amount === null) return;
+        if (amount === null) return;
 
-    const dateKey = orderDateKey(order.createdAt);
+        const dateKey = orderDateKey(order.createdAt);
 
-    if (!dateKey) return;
+        if (!dateKey) return;
 
-    if (dateKey >= rangeStart && dateKey <= rangeEnd) {
-      rangeTotal += amount;
-      rangeCount += 1;
+        if (dateKey >= rangeStart && dateKey <= rangeEnd) {
+          rangeTotal += amount;
+          rangeCount += 1;
+        }
+      });
+
+      setText(
+        "#incomeRangeLabel",
+        `Pemasukan ${displayIncomeDate(rangeStart)} — ${displayIncomeDate(rangeEnd)}`
+      );
+
+      setText("#incomeRangeTotal", rupiah(rangeTotal));
     }
-  });
-
-  setText(
-    "#incomeRangeLabel",
-    `Pemasukan ${displayIncomeDate(rangeStart)} — ${displayIncomeDate(rangeEnd)}`
-  );
-
-  setText("#incomeRangeTotal", rupiah(rangeTotal));
-}
 
     $("#incomeRangeStart")?.addEventListener(
       "change",
@@ -1413,35 +1413,35 @@
     // ===================================================
     // OPEN / CLOSE MANUAL ORDER
     // ===================================================
-  $("#btnNewManualOrder")?.addEventListener(
-  "click",
-  () => {
-    if (isBusy()) return;
+    $("#btnNewManualOrder")?.addEventListener(
+      "click",
+      () => {
+        if (isBusy()) return;
 
-    if (!manualOrderForm || !$("#manualCash")) {
-      alert(
-        "HTML kasir belum lengkap. Gunakan admin.html " +
-        "terbaru yang memiliki input manualCash."
-      );
-      return;
-    }
+        if (!manualOrderForm || !$("#manualCash")) {
+          alert(
+            "HTML kasir belum lengkap. Gunakan admin.html " +
+            "terbaru yang memiliki input manualCash."
+          );
+          return;
+        }
 
-    if (!pendingManualOrder) {
-      manualOrderForm.reset();
-      pendingManualSignature = "";
-    }
+        if (!pendingManualOrder) {
+          manualOrderForm.reset();
+          pendingManualSignature = "";
+        }
 
-    const orderDateInput = $("#manualOrderDate");
+        const orderDateInput = $("#manualOrderDate");
 
-    if (orderDateInput && !orderDateInput.value) {
-      orderDateInput.value = jakartaDateKey();
-    }
+        if (orderDateInput && !orderDateInput.value) {
+          orderDateInput.value = jakartaDateKey();
+        }
 
-    renderCashier();
-    show(manualModal);
-    $("#manualName")?.focus();
-  }
-);
+        renderCashier();
+        show(manualModal);
+        $("#manualName")?.focus();
+      }
+    );
 
     function closeManualModal() {
       if (writing || manualSubmitting) return;
@@ -1505,34 +1505,35 @@
         const name = value("#manualName");
         const phone = value("#manualPhone");
         const address = value("#manualAddress");
-        const customerNote = value("#manualNote");\
+        const customerNote = value("#manualNote");
+
         const orderDateValue = value("#manualOrderDate");
 
-if (!orderDateValue) {
-  alert("Pilih tanggal pesanan terlebih dahulu.");
-  $("#manualOrderDate")?.focus();
-  return;
-}
+        if (!orderDateValue) {
+          alert("Pilih tanggal pesanan terlebih dahulu.");
+          $("#manualOrderDate")?.focus();
+          return;
+        }
 
-const selectedDate = new Date(
-  `${orderDateValue}T00:00:00`
-);
+        const selectedDate = new Date(
+          `${orderDateValue}T00:00:00`
+        );
 
-const todayJakarta = new Date(
-  new Date().toLocaleString("en-US", {
-    timeZone: "Asia/Jakarta"
-  })
-);
+        const todayJakarta = new Date(
+          new Date().toLocaleString("en-US", {
+            timeZone: "Asia/Jakarta"
+          })
+        );
 
-todayJakarta.setHours(23, 59, 59, 999);
+        todayJakarta.setHours(23, 59, 59, 999);
 
-if (selectedDate > todayJakarta) {
-  alert(
-    "Tanggal pesanan tidak boleh lebih dari tanggal hari ini."
-  );
-  $("#manualOrderDate")?.focus();
-  return;
-}
+        if (selectedDate > todayJakarta) {
+          alert(
+            "Tanggal pesanan tidak boleh lebih dari tanggal hari ini."
+          );
+          $("#manualOrderDate")?.focus();
+          return;
+        }
 
         if (!name || !phone || !address) {
           alert(
@@ -1596,23 +1597,25 @@ if (selectedDate > todayJakarta) {
             if (!proceed) return;
           }
 
-  const nowTime = new Date().toLocaleTimeString("id-ID", {
-  timeZone: "Asia/Jakarta",
-  hour: "2-digit",
-  minute: "2-digit"
-});
+          const nowTime = new Date().toLocaleTimeString("id-ID", {
+            timeZone: "Asia/Jakarta",
+            hour: "2-digit",
+            minute: "2-digit"
+          });
 
-pendingManualOrder = {
-  id: newId(),
-  createdAt:
-    `${orderDateValue.split("-")[2]}/` +
-    `${orderDateValue.split("-")[1]}/` +
-    `${orderDateValue.split("-")[0]}, ` +
-    `${nowTime} WIB`,
-  ...fields
-};
+          pendingManualOrder = {
+            id: newId(),
+            createdAt:
+              `${orderDateValue.split("-")[2]}/` +
+              `${orderDateValue.split("-")[1]}/` +
+              `${orderDateValue.split("-")[0]}, ` +
+              `${nowTime} WIB`,
+            ...fields
+          };
 
-pendingManualSignature = signature;
+          pendingManualSignature = signature;
+        }
+
         const order = pendingManualOrder;
 
         manualSubmitting = true;
