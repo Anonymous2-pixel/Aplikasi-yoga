@@ -1413,29 +1413,35 @@
     // ===================================================
     // OPEN / CLOSE MANUAL ORDER
     // ===================================================
-    $("#btnNewManualOrder")?.addEventListener(
-      "click",
-      () => {
-        if (isBusy()) return;
+  $("#btnNewManualOrder")?.addEventListener(
+  "click",
+  () => {
+    if (isBusy()) return;
 
-        if (!manualOrderForm || !$("#manualCash")) {
-          alert(
-            "HTML kasir belum lengkap. Gunakan admin.html " +
-            "terbaru yang memiliki input manualCash."
-          );
-          return;
-        }
+    if (!manualOrderForm || !$("#manualCash")) {
+      alert(
+        "HTML kasir belum lengkap. Gunakan admin.html " +
+        "terbaru yang memiliki input manualCash."
+      );
+      return;
+    }
 
-        if (!pendingManualOrder) {
-          manualOrderForm.reset();
-          pendingManualSignature = "";
-        }
+    if (!pendingManualOrder) {
+      manualOrderForm.reset();
+      pendingManualSignature = "";
+    }
 
-        renderCashier();
-        show(manualModal);
-        $("#manualName")?.focus();
-      }
-    );
+    const orderDateInput = $("#manualOrderDate");
+
+    if (orderDateInput && !orderDateInput.value) {
+      orderDateInput.value = jakartaDateKey();
+    }
+
+    renderCashier();
+    show(manualModal);
+    $("#manualName")?.focus();
+  }
+);
 
     function closeManualModal() {
       if (writing || manualSubmitting) return;
@@ -1499,7 +1505,34 @@
         const name = value("#manualName");
         const phone = value("#manualPhone");
         const address = value("#manualAddress");
-        const customerNote = value("#manualNote");
+        const customerNote = value("#manualNote");\
+        const orderDateValue = value("#manualOrderDate");
+
+if (!orderDateValue) {
+  alert("Pilih tanggal pesanan terlebih dahulu.");
+  $("#manualOrderDate")?.focus();
+  return;
+}
+
+const selectedDate = new Date(
+  `${orderDateValue}T00:00:00`
+);
+
+const todayJakarta = new Date(
+  new Date().toLocaleString("en-US", {
+    timeZone: "Asia/Jakarta"
+  })
+);
+
+todayJakarta.setHours(23, 59, 59, 999);
+
+if (selectedDate > todayJakarta) {
+  alert(
+    "Tanggal pesanan tidak boleh lebih dari tanggal hari ini."
+  );
+  $("#manualOrderDate")?.focus();
+  return;
+}
 
         if (!name || !phone || !address) {
           alert(
@@ -1563,15 +1596,23 @@
             if (!proceed) return;
           }
 
-          pendingManualOrder = {
-            id: newId(),
-            createdAt: orderTime(),
-            ...fields
-          };
+  const nowTime = new Date().toLocaleTimeString("id-ID", {
+  timeZone: "Asia/Jakarta",
+  hour: "2-digit",
+  minute: "2-digit"
+});
 
-          pendingManualSignature = signature;
-        }
+pendingManualOrder = {
+  id: newId(),
+  createdAt:
+    `${orderDateValue.split("-")[2]}/` +
+    `${orderDateValue.split("-")[1]}/` +
+    `${orderDateValue.split("-")[0]}, ` +
+    `${nowTime} WIB`,
+  ...fields
+};
 
+pendingManualSignature = signature;
         const order = pendingManualOrder;
 
         manualSubmitting = true;
