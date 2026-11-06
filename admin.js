@@ -1505,7 +1505,7 @@
         const name = value("#manualName");
         const phone = value("#manualPhone");
         const address = value("#manualAddress");
-        const customerNote = value("#manualNote");\
+        const customerNote = value("#manualNote");
         const orderDateValue = value("#manualOrderDate");
 
 if (!orderDateValue) {
