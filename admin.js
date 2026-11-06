@@ -484,7 +484,7 @@
     }
 
     // ===================================================
-    // DASHBOARD PEMASUKAN
+    // DASHBOARD PEMASUKAN RENTANG TANGGAL
     // ===================================================
     function jakartaDateKey() {
       const parts = new Intl.DateTimeFormat("en-GB", {
@@ -540,16 +540,6 @@
       }).format(new Date(Date.UTC(year, month - 1, day)));
     }
 
-    function displayIncomeMonth(key) {
-      const [year, month] = key.split("-").map(Number);
-
-      return new Intl.DateTimeFormat("id-ID", {
-        timeZone: "UTC",
-        month: "long",
-        year: "numeric"
-      }).format(new Date(Date.UTC(year, month - 1, 1)));
-    }
-
     function getRecordedPaymentTotal(order) {
       const payment = splitPaymentNote(order.note);
 
@@ -578,25 +568,14 @@
     }
 
     function renderIncomeDashboard() {
-      const monthInput = $("#incomeMonth");
       const rangeStartInput = $("#incomeRangeStart");
       const rangeEndInput = $("#incomeRangeEnd");
-      const dailyList = $("#incomeDailyList");
 
-      if (
-        !monthInput ||
-        !rangeStartInput ||
-        !rangeEndInput ||
-        !dailyList
-      ) {
+      if (!rangeStartInput || !rangeEndInput) {
         return;
       }
 
       const today = jakartaDateKey();
-
-      if (!monthInput.value) {
-        monthInput.value = today.slice(0, 7);
-      }
 
       if (!rangeStartInput.value) {
         rangeStartInput.value = today;
@@ -605,8 +584,6 @@
       if (!rangeEndInput.value) {
         rangeEndInput.value = today;
       }
-
-      const selectedMonth = monthInput.value;
 
       // Jika tanggal awal dan akhir tertukar,
       // sistem otomatis mengurutkannya.
@@ -617,180 +594,8 @@
         [rangeStart, rangeEnd] = [rangeEnd, rangeStart];
       }
 
-      let monthTotal = 0;
       let rangeTotal = 0;
-      let monthCount = 0;
       let rangeCount = 0;
-
-      let withoutPayment = 0;
-      let invalidDateCount = 0;
-      let cancelledPaidCount = 0;
-
-      const daily = new Map();
-
-      orders.forEach(order => {
-        const amount = getRecordedPaymentTotal(order);
-
-        if (amount === null) {
-          withoutPayment += 1;
-          return;
-        }
-
-        const dateKey = orderDateKey(order.createdAt);
-
-        if (!dateKey) {
-          invalidDateCount += 1;
-          return;
-        }
-
-        if (order.status === "Dibatalkan") {
-          cancelledPaidCount += 1;
-        }
-
-        if (dateKey >= rangeStart && dateKey <= rangeEnd) {
-          rangeTotal += amount;
-          rangeCount += 1;
-        }
-
-        if (dateKey.slice(0, 7) === selectedMonth) {
-          monthTotal += amount;
-          monthCount += 1;
-
-          const entry = daily.get(dateKey) || {
-            total: 0,
-            count: 0
-          };
-
-          entry.total += amount;
-          entry.count += 1;
-
-          daily.set(dateKey, entry);
-        }
-      });
-
-      setText(
-        "#incomeRangeLabel",
-        `Pemasukan ${displayIncomeDate(rangeStart)} — ${displayIncomeDate(rangeEnd)}`
-      );
-
-      setText("#incomeRangeTotal", rupiah(rangeTotal));
-
-      setText(
-        "#incomeMonthLabel",
-        displayIncomeMonth(selectedMonth)
-      );
-
-      setText("#incomeMonthTotal", rupiah(monthTotal));
-
-      setText(
-        "#incomeRecapPeriod",
-        displayIncomeMonth(selectedMonth)
-      );
-
-      const entries = Array.from(daily.entries())
-        .sort(([dateA], [dateB]) =>
-          dateB.localeCompare(dateA)
-        );
-
-      dailyList.innerHTML = entries.length
-        ? entries.map(([dateKey, entry]) => `
-            <div class="income-day-row">
-              <div>
-                <b>
-                  ${escapeHtml(
-                    displayIncomeDate(dateKey)
-                  )}
-                </b>
-                <small>${entry.count} pesanan</small>
-              </div>
-              <strong>
-                ${escapeHtml(rupiah(entry.total))}
-              </strong>
-            </div>
-          `).join("")
-        : `
-            <p class="income-empty">
-              Belum ada pembayaran kasir tercatat pada bulan ini.
-            </p>
-          `;
-
-      const notices = [
-        "Rekap memakai tanggal pembuatan pesanan, bukan tanggal pembayaran terpisah.",
-        `${withoutPayment} pesanan tidak dihitung karena tidak memiliki catatan pembayaran kasir yang dapat dibaca.`,
-        "Filter rentang tanggal menghitung tanggal awal dan tanggal akhir."
-      ];
-
-      if (invalidDateCount) {
-        notices.push(
-          `${invalidDateCount} pesanan lunas memiliki tanggal yang tidak terbaca, sehingga tidak masuk rekap.`
-        );
-      }
-
-      if (cancelledPaidCount) {
-        notices.push(
-          `${cancelledPaidCount} pesanan berstatus Dibatalkan masih memiliki catatan lunas dan tetap dihitung.`
-        );
-      }
-
-      setText("#incomeNotice", notices.join(" "));
-    }
-
-    $("#incomeRangeStart")?.addEventListener(
-      "change",
-      renderIncomeDashboard
-    );
-
-    $("#incomeRangeEnd")?.addEventListener(
-      "change",
-      renderIncomeDashboard
-    );
-
-    $("#incomeMonth")?.addEventListener(
-      "change",
-      renderIncomeDashboard
-    );
-
-    // ===================================================
-    // REKAP PEMASUKAN KE PDF
-    // ===================================================
-    function buildIncomeRecapPdf() {
-      const monthInput = $("#incomeMonth");
-      const rangeStartInput = $("#incomeRangeStart");
-      const rangeEndInput = $("#incomeRangeEnd");
-      const pdfArea = $("#incomePdfArea");
-
-      if (
-        !monthInput ||
-        !rangeStartInput ||
-        !rangeEndInput ||
-        !pdfArea
-      ) {
-        alert("Filter rekap belum tersedia.");
-        return;
-      }
-
-      let rangeStart = rangeStartInput.value;
-      let rangeEnd = rangeEndInput.value;
-      const selectedMonth = monthInput.value;
-
-      if (!rangeStart || !rangeEnd || !selectedMonth) {
-        alert(
-          "Pilih rentang tanggal dan bulan terlebih dahulu."
-        );
-        return;
-      }
-
-      if (rangeStart > rangeEnd) {
-        [rangeStart, rangeEnd] = [rangeEnd, rangeStart];
-      }
-
-      let rangeTotal = 0;
-      let monthTotal = 0;
-      let rangeCount = 0;
-      let monthCount = 0;
-
-      const rangeRows = [];
-      const monthRows = [];
 
       orders.forEach(order => {
         const amount = getRecordedPaymentTotal(order);
@@ -801,166 +606,29 @@
 
         if (!dateKey) return;
 
+        // Tanggal awal dan akhir ikut dihitung.
         if (dateKey >= rangeStart && dateKey <= rangeEnd) {
           rangeTotal += amount;
           rangeCount += 1;
-
-          rangeRows.push({
-            date: displayIncomeDate(dateKey),
-            id: order.id,
-            name: order.name,
-            service: order.service,
-            amount
-          });
-        }
-
-        if (dateKey.slice(0, 7) === selectedMonth) {
-          monthTotal += amount;
-          monthCount += 1;
-
-          const existing = monthRows.find(
-            row => row.dateKey === dateKey
-          );
-
-          if (existing) {
-            existing.count += 1;
-            existing.total += amount;
-          } else {
-            monthRows.push({
-              dateKey,
-              date: displayIncomeDate(dateKey),
-              count: 1,
-              total: amount
-            });
-          }
         }
       });
 
-      monthRows.sort((a, b) =>
-        b.dateKey.localeCompare(a.dateKey)
+      setText(
+        "#incomeRangeLabel",
+        `Pemasukan ${displayIncomeDate(rangeStart)} — ${displayIncomeDate(rangeEnd)}`
       );
 
-      const periodText =
-        `${displayIncomeDate(rangeStart)} sampai ` +
-        displayIncomeDate(rangeEnd);
-
-      pdfArea.innerHTML = `
-        <div class="income-pdf-title">
-          REKAP PEMASUKAN YOGA LAUNDRY
-        </div>
-
-        <p class="income-pdf-sub">
-          Periode rentang: ${escapeHtml(periodText)}
-        </p>
-
-        <div class="income-pdf-section">
-          <h3>Ringkasan dua rekap</h3>
-
-          <table class="income-pdf-table">
-            <tr>
-              <th>Pemasukan rentang tanggal</th>
-              <td>${escapeHtml(rupiah(rangeTotal))}</td>
-            </tr>
-            <tr>
-              <th>Jumlah pesanan rentang</th>
-              <td>${rangeCount} pesanan</td>
-            </tr>
-            <tr>
-              <th>Pemasukan bulan</th>
-              <td>${escapeHtml(
-                displayIncomeMonth(selectedMonth)
-              )}</td>
-            </tr>
-            <tr>
-              <th>Jumlah pesanan bulan</th>
-              <td>${monthCount} pesanan</td>
-            </tr>
-            <tr class="income-pdf-total">
-              <th>Total pemasukan bulan</th>
-              <td>${escapeHtml(rupiah(monthTotal))}</td>
-            </tr>
-          </table>
-        </div>
-
-        <div class="income-pdf-section">
-          <h3>Detail transaksi rentang tanggal</h3>
-
-          ${
-            rangeRows.length
-              ? `
-                <table class="income-pdf-table">
-                  <thead>
-                    <tr>
-                      <th>Tanggal</th>
-                      <th>No. Resi</th>
-                      <th>Pelanggan</th>
-                      <th>Layanan</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${rangeRows.map(row => `
-                      <tr>
-                        <td>${escapeHtml(row.date)}</td>
-                        <td>${escapeHtml(row.id)}</td>
-                        <td>${escapeHtml(row.name)}</td>
-                        <td>${escapeHtml(row.service)}</td>
-                        <td>${escapeHtml(rupiah(row.amount))}</td>
-                      </tr>
-                    `).join("")}
-                  </tbody>
-                </table>
-              `
-              : `<p>Tidak ada transaksi lunas pada rentang tanggal ini.</p>`
-          }
-        </div>
-
-        <div class="income-pdf-section">
-          <h3>Rekap harian ${escapeHtml(
-            displayIncomeMonth(selectedMonth)
-          )}</h3>
-
-          ${
-            monthRows.length
-              ? `
-                <table class="income-pdf-table">
-                  <thead>
-                    <tr>
-                      <th>Tanggal</th>
-                      <th>Jumlah pesanan</th>
-                      <th>Total pemasukan</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${monthRows.map(row => `
-                      <tr>
-                        <td>${escapeHtml(row.date)}</td>
-                        <td>${row.count} pesanan</td>
-                        <td>${escapeHtml(rupiah(row.total))}</td>
-                      </tr>
-                    `).join("")}
-                    <tr class="income-pdf-total">
-                      <td colspan="2">Total bulan</td>
-                      <td>${escapeHtml(rupiah(monthTotal))}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              `
-              : `<p>Tidak ada transaksi lunas pada bulan ini.</p>`
-          }
-        </div>
-
-        <p class="income-pdf-sub">
-          Dibuat otomatis oleh Panel Admin Yoga Laundry.
-        </p>
-      `;
-
-      window.print();
+      setText("#incomeRangeTotal", rupiah(rangeTotal));
     }
 
-    $("#btnDownloadIncomePdf")?.addEventListener(
-      "click",
-      buildIncomeRecapPdf
+    $("#incomeRangeStart")?.addEventListener(
+      "change",
+      renderIncomeDashboard
+    );
+
+    $("#incomeRangeEnd")?.addEventListener(
+      "change",
+      renderIncomeDashboard
     );
 
     // ===================================================
