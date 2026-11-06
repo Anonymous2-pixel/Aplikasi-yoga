@@ -161,65 +161,72 @@
         </div>
       </section>
       <!-- DASHBOARD PEMASUKAN ADMIN -->
+<!-- DASHBOARD PEMASUKAN ADMIN -->
 <section class="income-panel" aria-labelledby="incomeTitle">
   <div class="income-heading">
     <div>
       <span class="income-eyebrow">REKAP KASIR</span>
       <h2 id="incomeTitle">Pemasukan Laundry</h2>
       <p>
-        Berdasarkan tagihan lunas yang tercatat dari kasir,
-        dikelompokkan menurut tanggal pesanan.
+        Total tagihan lunas yang tercatat dari kasir.
       </p>
     </div>
   </div>
 
-  <div class="income-filters">
-  <div class="income-filter-field">
-    <label for="incomeDate">Pilih tanggal</label>
-    <input type="date" id="incomeDate">
+  <div class="income-controls">
+    <div class="income-filter-field">
+      <label for="incomeDate">Tanggal</label>
+      <input type="date" id="incomeDate">
+    </div>
+
+    <div class="income-filter-field">
+      <label for="incomeMonth">Bulan</label>
+      <input type="month" id="incomeMonth">
+    </div>
+
+    <div class="income-filter-field">
+      <label for="incomeYear">Tahun</label>
+      <select id="incomeYear"></select>
+    </div>
   </div>
 
-  <div class="income-filter-field">
-    <label for="incomeMonth">Pilih bulan rekap</label>
-    <input type="month" id="incomeMonth">
-  </div>
+  <div class="income-summary">
+    <article class="income-card income-card-day">
+      <div class="income-card-head">
+        <span id="incomeDayLabel">Pemasukan tanggal pilihan</span>
+      </div>
 
-  <div class="income-filter-field">
-    <label for="incomeYear">Pilih tahun</label>
-    <select id="incomeYear"></select>
-  </div>
-</div>>
-  <div class="income-filter-field">
-  <label for="incomeYear">Pilih tahun</label>
-  <select id="incomeYear"></select>
-</div>
-
-  <div class="income-metrics">
-    <article class="income-metric">
-      <span id="incomeDayLabel">Pemasukan tanggal pilihan</span>
       <strong id="incomeDayTotal">Rp0</strong>
       <small id="incomeDayCount">0 pesanan lunas</small>
     </article>
 
-    <article class="income-metric">
-      <span id="incomeMonthLabel">Pemasukan bulan pilihan</span>
+    <article class="income-card income-card-month">
+      <div class="income-card-head">
+        <span id="incomeMonthLabel">Pemasukan bulan pilihan</span>
+      </div>
+
       <strong id="incomeMonthTotal">Rp0</strong>
       <small id="incomeMonthCount">0 pesanan lunas</small>
     </article>
 
-   <article class="income-metric">
-  <span id="incomeYearLabel">Pemasukan tahun pilihan</span>
-  <strong id="incomeYearTotal">Rp0</strong>
-  <small id="incomeYearCount">0 pesanan lunas</small>
-</article>
+    <article class="income-card income-card-year">
+      <div class="income-card-head">
+        <span id="incomeYearLabel">Pemasukan tahun pilihan</span>
+      </div>
+
+      <strong id="incomeYearTotal">Rp0</strong>
+      <small id="incomeYearCount">0 pesanan lunas</small>
+    </article>
   </div>
 
-  <div class="income-recap-heading">
-    <h3>Rincian per tanggal</h3>
-    <span id="incomeRecapPeriod"></span>
-  </div>
+  <div class="income-recap">
+    <div class="income-recap-head">
+      <h3>Rincian per tanggal</h3>
+      <span id="incomeRecapPeriod"></span>
+    </div>
 
-  <div id="incomeDailyList" class="income-daily-list"></div>
+    <div id="incomeDailyList" class="income-daily-list"></div>
+  </div>
 
   <p id="incomeNotice" class="income-notice"></p>
 </section>
