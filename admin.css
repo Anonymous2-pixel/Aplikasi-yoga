@@ -1640,4 +1640,120 @@ button {
     transform: none;
   }
 }
+/* ===================================================
+   KASIR PESANAN MANUAL
+   =================================================== */
+.cashier-panel.full-width {
+  grid-column: 1 / -1;
+}
+
+.cashier-panel {
+  min-width: 0;
+  padding: 18px;
+  background: #f8fbff;
+  border: 1px solid #cfe0fa;
+  border-radius: 14px;
+}
+
+.cashier-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.cashier-heading > span {
+  color: var(--navy);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cashier-heading small,
+.cashier-help {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.cashier-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cashier-line > span {
+  color: var(--muted);
+}
+
+.cashier-line strong {
+  min-width: 0;
+  color: var(--navy);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.cashier-total {
+  margin-bottom: 16px;
+  padding-block: 14px;
+  border-top: 1px dashed #cbd5e1;
+  border-bottom: 1px dashed #cbd5e1;
+}
+
+.cashier-total strong {
+  color: var(--blue);
+  font-size: 22px;
+}
+
+.cashier-panel .form-group input {
+  width: 100%;
+  min-width: 0;
+}
+
+.cashier-change {
+  margin-top: 14px;
+  padding: 12px;
+  background: #ecfdf5;
+  border-radius: 10px;
+}
+
+.cashier-change strong {
+  color: #047857;
+  font-size: 20px;
+}
+
+.cashier-change.is-short {
+  background: #fef2f2;
+}
+
+.cashier-change.is-short strong {
+  color: #b91c1c;
+}
+
+.cashier-message {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+@media screen and (max-width: 768px) {
+  .cashier-panel {
+    padding: 14px;
+  }
+
+  .cashier-total strong,
+  .cashier-change strong {
+    font-size: 20px;
+  }
+
+  #manualCash {
+    min-height: 48px;
+    font-size: 16px;
+  }
+}
 
