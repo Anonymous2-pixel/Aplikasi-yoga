@@ -613,16 +613,20 @@
             .filter(Boolean)
         )
       ).sort();
+const currentYear = Number(today.slice(0, 4));
 
- const currentYear = today.slice(0, 4);
-const nextYear = String(Number(currentYear) + 1);
+// Tampilkan 10 tahun ke depan:
+// 2026 sampai 2035, lalu otomatis bergeser tiap tahun.
+for (
+  let year = currentYear;
+  year <= currentYear + 9;
+  year++
+) {
+  const yearText = String(year);
 
-if (!years.includes(currentYear)) {
-  years.push(currentYear);
-}
-
-if (!years.includes(nextYear)) {
-  years.push(nextYear);
+  if (!years.includes(yearText)) {
+    years.push(yearText);
+  }
 }
 
 years.sort();
