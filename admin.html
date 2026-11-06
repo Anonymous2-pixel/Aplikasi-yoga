@@ -209,12 +209,18 @@
             </optgroup>
           </select>
         </div>
-
-        <div class="form-group">
-          <label>Estimasi Berat / Jumlah</label>
-          <input type="text" id="manualWeight" placeholder="Contoh: 4 kg atau 1 Bed Cover">
-        </div>
-
+<div class="form-group">
+  <label for="manualWeight">Berat Cucian (kg) *</label>
+  <input
+    type="number"
+    id="manualWeight"
+    min="0.01"
+    step="0.01"
+    inputmode="decimal"
+    required
+    placeholder="Contoh: 3 atau 3.5"
+  >
+</div>
         <div class="form-group full-width">
           <label>Catatan Khusus</label>
           <input type="text" id="manualNote" placeholder="Misal: Pisahkan pakaian putih, parfum ocean fresh">
