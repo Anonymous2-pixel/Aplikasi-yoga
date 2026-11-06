@@ -160,76 +160,84 @@
           </span>
         </div>
       </section>
-      <!-- DASHBOARD PEMASUKAN ADMIN -->
-<!-- DASHBOARD PEMASUKAN ADMIN -->
-<section class="income-panel" aria-labelledby="incomeTitle">
-  <div class="income-heading">
-    <div>
-      <span class="income-eyebrow">REKAP KASIR</span>
-      <h2 id="incomeTitle">Pemasukan Laundry</h2>
-      <p>
-        Total tagihan lunas yang tercatat dari kasir.
-      </p>
-    </div>
-  </div>
 
-  <div class="income-controls">
-    <div class="income-filter-field">
-      <label for="incomeDate">Tanggal</label>
-      <input type="date" id="incomeDate">
-    </div>
+      <!-- ===================================================
+           DASHBOARD PEMASUKAN ADMIN
+           =================================================== -->
+      <section class="income-panel" aria-labelledby="incomeTitle">
+        <div class="income-heading">
+          <div>
+            <span class="income-eyebrow">REKAP KASIR</span>
+            <h2 id="incomeTitle">Pemasukan Laundry</h2>
+            <p>
+              Total tagihan lunas yang tercatat dari kasir.
+            </p>
+          </div>
+        </div>
 
-    <div class="income-filter-field">
-      <label for="incomeMonth">Bulan</label>
-      <input type="month" id="incomeMonth">
-    </div>
+        <div class="income-controls">
+          <div class="income-filter-field">
+            <label for="incomeDate">Tanggal</label>
+            <input type="date" id="incomeDate">
+          </div>
 
-    <div class="income-filter-field">
-      <label for="incomeYear">Tahun</label>
-      <select id="incomeYear"></select>
-    </div>
-  </div>
+          <div class="income-filter-field">
+            <label for="incomeMonth">Bulan</label>
+            <input type="month" id="incomeMonth">
+          </div>
 
-  <div class="income-summary">
-    <article class="income-card income-card-day">
-      <div class="income-card-head">
-        <span id="incomeDayLabel">Pemasukan tanggal pilihan</span>
-      </div>
+          <div class="income-filter-field">
+            <label for="incomeYear">Tahun</label>
+            <select id="incomeYear"></select>
+          </div>
+        </div>
 
-      <strong id="incomeDayTotal">Rp0</strong>
-      <small id="incomeDayCount">0 pesanan lunas</small>
-    </article>
+        <div class="income-summary">
+          <article class="income-card income-card-day">
+            <div class="income-card-head">
+              <span id="incomeDayLabel">
+                Pemasukan tanggal pilihan
+              </span>
+            </div>
 
-    <article class="income-card income-card-month">
-      <div class="income-card-head">
-        <span id="incomeMonthLabel">Pemasukan bulan pilihan</span>
-      </div>
+            <strong id="incomeDayTotal">Rp0</strong>
+          </article>
 
-      <strong id="incomeMonthTotal">Rp0</strong>
-      <small id="incomeMonthCount">0 pesanan lunas</small>
-    </article>
+          <article class="income-card income-card-month">
+            <div class="income-card-head">
+              <span id="incomeMonthLabel">
+                Pemasukan bulan pilihan
+              </span>
+            </div>
 
-    <article class="income-card income-card-year">
-      <div class="income-card-head">
-        <span id="incomeYearLabel">Pemasukan tahun pilihan</span>
-      </div>
+            <strong id="incomeMonthTotal">Rp0</strong>
+          </article>
 
-      <strong id="incomeYearTotal">Rp0</strong>
-      <small id="incomeYearCount">0 pesanan lunas</small>
-    </article>
-  </div>
+          <article class="income-card income-card-year">
+            <div class="income-card-head">
+              <span id="incomeYearLabel">
+                Total pemasukan tahun ini
+              </span>
+            </div>
 
-  <div class="income-recap">
-    <div class="income-recap-head">
-      <h3>Rincian per tanggal</h3>
-      <span id="incomeRecapPeriod"></span>
-    </div>
+            <strong id="incomeYearTotal">Rp0</strong>
+          </article>
+        </div>
 
-    <div id="incomeDailyList" class="income-daily-list"></div>
-  </div>
+        <div class="income-recap">
+          <div class="income-recap-head">
+            <h3>Rincian per tanggal</h3>
+            <span id="incomeRecapPeriod"></span>
+          </div>
 
-  <p id="incomeNotice" class="income-notice"></p>
-</section>
+          <div
+            id="incomeDailyList"
+            class="income-daily-list"
+          ></div>
+        </div>
+
+        <p id="incomeNotice" class="income-notice"></p>
+      </section>
 
       <!-- PENCARIAN DAN FILTER -->
       <section class="toolbar" aria-label="Pencarian dan aksi pesanan">
@@ -530,20 +538,20 @@
               Uang Tunai Diterima (Rp) *
             </label>
 
-          <input
-  type="text"
-  id="manualCash"
-  inputmode="numeric"
-  pattern="[0-9]+(\.[0-9]{3})*"
-  autocomplete="off"
-  required
-  placeholder="Contoh: 50.000"
-  aria-describedby="cashierCashHelp"
->
+            <input
+              type="text"
+              id="manualCash"
+              inputmode="numeric"
+              pattern="[0-9]+(\.[0-9]{3})*"
+              autocomplete="off"
+              required
+              placeholder="Contoh: 50.000"
+              aria-describedby="cashierCashHelp"
+            >
 
-          <small id="cashierCashHelp" class="cashier-help">
-  Ketik nominal uang. Titik ribuan ditambahkan otomatis.
-</small>
+            <small id="cashierCashHelp" class="cashier-help">
+              Ketik nominal uang. Titik ribuan ditambahkan otomatis.
+            </small>
           </div>
 
           <div class="cashier-line cashier-change">
