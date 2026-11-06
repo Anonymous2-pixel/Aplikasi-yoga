@@ -482,11 +482,262 @@
 
       return "";
     }
+    // ===================================================
+// DASHBOARD PEMASUKAN
+// ===================================================
+function jakartaDateKey() {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+
+  const get = type =>
+    parts.find(part => part.type === type)?.value;
+
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
+function orderDateKey(createdAt) {
+  // Format pesanan yang dibuat kode sekarang:
+  // dd/mm/yyyy, HH.mm WIB
+  const match = String(createdAt || "")
+    .trim()
+    .match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\D|$)/);
+
+  if (!match) return "";
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    return "";
+  }
+
+  return (
+    `${year}-` +
+    `${String(month).padStart(2, "0")}-` +
+    String(day).padStart(2, "0")
+  );
+}
+
+function displayIncomeDate(key) {
+  const [year, month, day] = key.split("-").map(Number);
+
+  return new Intl.DateTimeFormat("id-ID", {
+    timeZone: "UTC",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function displayIncomeMonth(key) {
+  const [year, month] = key.split("-").map(Number);
+
+  return new Intl.DateTimeFormat("id-ID", {
+    timeZone: "UTC",
+    month: "long",
+    year: "numeric"
+  }).format(new Date(Date.UTC(year, month - 1, 1)));
+}
+
+function getRecordedPaymentTotal(order) {
+  const payment = splitPaymentNote(order.note);
+
+  // Hanya catatan kasir dengan penanda yang dibuat
+  // oleh admin.js terbaru.
+  if (!payment.paymentText) return null;
+
+  const text = payment.paymentText;
+
+  if (!/^Status pembayaran:\s*LUNAS\s*$/im.test(text)) {
+    return null;
+  }
+
+  // Ambil total tagihan, BUKAN uang diterima.
+  const match = text.match(
+    /^Total tagihan:\s*Rp\s*([0-9.]+)\s*$/im
+  );
+
+  if (!match) return null;
+
+  const digits = match[1].replace(/\./g, "");
+  const amount = Number(digits);
+
+  if (!Number.isSafeInteger(amount) || amount <= 0) {
+    return null;
+  }
+
+  return amount;
+}
+
+function renderIncomeDashboard() {
+  const dateInput = $("#incomeDate");
+  const monthInput = $("#incomeMonth");
+  const dailyList = $("#incomeDailyList");
+
+  if (!dateInput || !monthInput || !dailyList) return;
+
+  const today = jakartaDateKey();
+
+  if (!dateInput.value) dateInput.value = today;
+  if (!monthInput.value) {
+    monthInput.value = today.slice(0, 7);
+  }
+
+  const selectedDate = dateInput.value;
+  const selectedMonth = monthInput.value;
+
+  let dayTotal = 0;
+  let dayCount = 0;
+
+  let monthTotal = 0;
+  let monthCount = 0;
+
+  let allTotal = 0;
+  let allCount = 0;
+
+  let withoutPayment = 0;
+  let invalidDateCount = 0;
+  let cancelledPaidCount = 0;
+
+  const daily = new Map();
+
+  orders.forEach(order => {
+    const amount = getRecordedPaymentTotal(order);
+
+    if (amount === null) {
+      withoutPayment += 1;
+      return;
+    }
+
+    allTotal += amount;
+    allCount += 1;
+
+    if (order.status === "Dibatalkan") {
+      cancelledPaidCount += 1;
+    }
+
+    const dateKey = orderDateKey(order.createdAt);
+
+    if (!dateKey) {
+      invalidDateCount += 1;
+      return;
+    }
+
+    if (dateKey === selectedDate) {
+      dayTotal += amount;
+      dayCount += 1;
+    }
+
+    if (dateKey.slice(0, 7) === selectedMonth) {
+      monthTotal += amount;
+      monthCount += 1;
+
+      const entry = daily.get(dateKey) || {
+        total: 0,
+        count: 0
+      };
+
+      entry.total += amount;
+      entry.count += 1;
+
+      daily.set(dateKey, entry);
+    }
+  });
+
+  setText(
+    "#incomeDayLabel",
+    displayIncomeDate(selectedDate)
+  );
+
+  setText("#incomeDayTotal", rupiah(dayTotal));
+  setText("#incomeDayCount", `${dayCount} pesanan lunas`);
+
+  setText(
+    "#incomeMonthLabel",
+    displayIncomeMonth(selectedMonth)
+  );
+
+  setText("#incomeMonthTotal", rupiah(monthTotal));
+  setText(
+    "#incomeMonthCount",
+    `${monthCount} pesanan lunas`
+  );
+
+  setText("#incomeAllTotal", rupiah(allTotal));
+  setText("#incomeAllCount", `${allCount} pesanan lunas`);
+
+  setText(
+    "#incomeRecapPeriod",
+    displayIncomeMonth(selectedMonth)
+  );
+
+  const entries = Array.from(daily.entries())
+    .sort(([dateA], [dateB]) => dateB.localeCompare(dateA));
+
+  dailyList.innerHTML = entries.length
+    ? entries.map(([dateKey, entry]) => `
+        <div class="income-day-row">
+          <div>
+            <b>${escapeHtml(displayIncomeDate(dateKey))}</b>
+            <small>${entry.count} pesanan lunas</small>
+          </div>
+          <strong>${escapeHtml(rupiah(entry.total))}</strong>
+        </div>
+      `).join("")
+    : `
+        <p class="income-empty">
+          Belum ada pembayaran kasir tercatat pada bulan ini.
+        </p>
+      `;
+
+  const notices = [
+    "Rekap memakai tanggal pembuatan pesanan, bukan tanggal pembayaran terpisah.",
+    `${withoutPayment} pesanan tidak dihitung karena tidak memiliki catatan pembayaran kasir yang dapat dibaca.`,
+    "Akumulasi mengikuti pesanan yang masih ada di database; data yang dihapus tidak ikut dihitung."
+  ];
+
+  if (invalidDateCount) {
+    notices.push(
+      `${invalidDateCount} pesanan lunas memiliki tanggal yang tidak terbaca: masuk akumulasi, tetapi tidak masuk rekap harian/bulanan.`
+    );
+  }
+
+  if (cancelledPaidCount) {
+    notices.push(
+      `${cancelledPaidCount} pesanan berstatus Dibatalkan masih memiliki catatan lunas dan tetap dihitung. Refund belum dicatat oleh sistem.`
+    );
+  }
+
+  setText("#incomeNotice", notices.join(" "));
+}
+
+$("#incomeDate")?.addEventListener(
+  "change",
+  renderIncomeDashboard
+);
+
+$("#incomeMonth")?.addEventListener(
+  "change",
+  renderIncomeDashboard
+);
 
     // ===================================================
     // DASHBOARD / TABLE
     // ===================================================
     function renderDashboard() {
+        renderIncomeDashboard();
       setText("#metricTotal", orders.length);
 
       setText(
