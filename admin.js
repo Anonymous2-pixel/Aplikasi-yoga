@@ -1165,7 +1165,7 @@ const cash = /^\d+$/.test(cashDigits)
           "Masukkan berat lebih dari 0, maksimal dua angka desimal.";
       } else if (!bill.validCash) {
         message =
-          "Masukkan uang tunai yang diterima, tanpa titik.";
+           "Masukkan uang tunai yang diterima. Titik ribuan ditambahkan otomatis.";
       } else if (short) {
         message =
           "Uang belum cukup. Pesanan belum bisa disimpan sebagai lunas.";
