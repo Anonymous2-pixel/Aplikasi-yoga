@@ -584,14 +584,35 @@
           : "";
 
         return `
-          <tr data-id="${id}">
-            <td>
-              <button
-                type="button"
-                class="resi-badge"
-                data-action="receipt"
-              >#${id}</button>
-            </td>
+    <tr class="order-summary-card" data-id="${id}">
+           <td class="order-summary-cell">
+  <button
+    type="button"
+    class="order-summary-toggle"
+    data-action="toggle"
+    aria-expanded="false"
+  >
+    <span class="order-summary-top">
+      <span class="order-summary-id">#${id}</span>
+      <span class="order-summary-hint" aria-hidden="true"></span>
+    </span>
+
+    <span class="order-summary-name">
+      ${escapeHtml(order.name)}
+    </span>
+
+    <span class="order-summary-service">
+      ${escapeHtml(order.service)}
+      · ${escapeHtml(order.weight || "-")}
+    </span>
+
+    <span
+      class="order-summary-status ${getStatusClass(order.status)}"
+    >
+      ${escapeHtml(order.status)}
+    </span>
+  </button>
+</td>
 
             <td style="font-size:11px;white-space:nowrap;">
               ${escapeHtml(order.createdAt)}
@@ -883,30 +904,43 @@
     // ===================================================
     // TABLE EVENTS
     // ===================================================
-    tableBody?.addEventListener("click", event => {
-      const button = event.target.closest(
-        "button[data-action]"
-      );
+tableBody?.addEventListener("click", event => {
+  const button = event.target.closest(
+    "button[data-action]"
+  );
 
-      if (!button || button.disabled) return;
+  if (!button || button.disabled) return;
 
-      const id = button.closest("tr")?.dataset.id;
-      if (!id) return;
+  const row = button.closest("tr");
+  const id = row?.dataset.id;
 
-      const action = button.dataset.action;
+  if (!id) return;
 
-      if (action === "receipt") {
-        showReceiptModal(id);
-      }
+  const action = button.dataset.action;
 
-      if (action === "edit") {
-        editOrder(id);
-      }
+  if (action === "toggle") {
+    const expanded = row.classList.toggle("is-expanded");
 
-      if (action === "delete") {
-        deleteOrder(id);
-      }
-    });
+    button.setAttribute(
+      "aria-expanded",
+      String(expanded)
+    );
+
+    return;
+  }
+
+  if (action === "receipt") {
+    showReceiptModal(id);
+  }
+
+  if (action === "edit") {
+    editOrder(id);
+  }
+
+  if (action === "delete") {
+    deleteOrder(id);
+  }
+});
 
     tableBody?.addEventListener("change", event => {
       if (!event.target.matches(
