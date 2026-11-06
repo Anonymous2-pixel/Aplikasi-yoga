@@ -614,12 +614,18 @@
         )
       ).sort();
 
-      const currentYear = today.slice(0, 4);
+ const currentYear = today.slice(0, 4);
+const nextYear = String(Number(currentYear) + 1);
 
-      if (!years.includes(currentYear)) {
-        years.push(currentYear);
-        years.sort();
-      }
+if (!years.includes(currentYear)) {
+  years.push(currentYear);
+}
+
+if (!years.includes(nextYear)) {
+  years.push(nextYear);
+}
+
+years.sort();
 
       const previousYear = yearInput.value;
 
