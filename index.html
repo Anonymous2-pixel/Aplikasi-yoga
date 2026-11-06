@@ -1,40 +1,46 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Yoga Laundry - Laundry bersih, wangi, dan antar jemput.">
-  <title>Yoga Laundry | Bersih Tanpa Ribet</title> 
+  <meta
+    name="description"
+    content="Yoga Laundry - Laundry bersih, wangi, dan antar jemput."
+  >
+
+  <title>Yoga Laundry | Bersih Tanpa Ribet</title>
+
   <!-- PWA Yoga Laundry -->
-<link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#10233c">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#10233c">
+  <meta name="apple-mobile-web-app-title" content="Yoga Laundry">
 
-<!-- Ikon aplikasi -->
-<link
-  rel="icon"
-  type="image/png"
-  sizes="192x192"
-  href="/icons/icon-192.png"
->
+  <!-- File ikon berada di folder utama, sejajar dengan index.html -->
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="192x192"
+    href="/icon-192.png"
+  >
+  <link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="/apple-touch-icon.png"
+  >
 
-<link
-  rel="apple-touch-icon"
-  sizes="180x180"
-  href="/icons/apple-touch-icon.png"
->
-
-<meta name="apple-mobile-web-app-title" content="Yoga Laundry">
-
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap"
-    rel="stylesheet">
+    rel="stylesheet"
+  >
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <!-- NAVIGATION -->
   <header class="site-header">
     <nav class="nav-wrap">
       <a class="brand" href="#beranda">
@@ -42,8 +48,16 @@
         YOGA <b>LAUNDRY</b>
       </a>
 
-      <button id="menuButton" class="menu-button" type="button" aria-expanded="false"
-        aria-label="Buka menu navigasi">MENU +</button>
+      <button
+        id="menuButton"
+        class="menu-button"
+        type="button"
+        aria-expanded="false"
+        aria-controls="navLinks"
+        aria-label="Menu navigasi"
+      >
+        MENU +
+      </button>
 
       <div id="navLinks" class="nav-links">
         <a href="#layanan">Layanan</a>
@@ -51,12 +65,19 @@
         <a href="#lokasi">Lokasi</a>
         <a href="#pesan">Kontak</a>
         <a href="#cek-resi" id="btnOpenTrackingNav">Cek Resi</a>
-        <a class="nav-order" href="#pesan" data-open-order="true">PESAN SEKARANG</a>
+        <a
+          class="nav-order"
+          href="#pesan"
+          data-open-order="true"
+        >
+          PESAN SEKARANG
+        </a>
       </div>
     </nav>
   </header>
 
   <main>
+    <!-- HERO -->
     <section id="beranda" class="hero">
       <div class="hero-grid">
         <div class="hero-content">
@@ -69,17 +90,25 @@
           </h1>
 
           <p class="hero-copy">
-            Baju kotor seharian jangan bikin lo pusing, bro. Tinggal pilih paket
-            laundry kamu sekarang, duduk manis, dan tunggu baju kamu balik dalam
-            keadaan bersih, wangi, dan rapi siap pakai.
+            Baju kotor seharian jangan bikin lo pusing, bro. Tinggal pilih
+            paket laundry kamu sekarang, duduk manis, dan tunggu baju kamu
+            balik dalam keadaan bersih, wangi, dan rapi siap pakai.
           </p>
 
           <div class="hero-actions">
-            <button class="button button-primary" type="button" data-open-order="true">
-              PESAN JEMPUTAN <span>-></span>
+            <button
+              class="button button-primary"
+              type="button"
+              data-open-order="true"
+            >
+              PESAN JEMPUTAN <span>→</span>
             </button>
 
-            <button class="button button-secondary" type="button" id="btnOpenTrackingHero">
+            <button
+              class="button button-secondary"
+              type="button"
+              id="btnOpenTrackingHero"
+            >
               CEK STATUS RESI
             </button>
           </div>
@@ -113,6 +142,7 @@
       </div>
     </section>
 
+    <!-- RUNNING TEXT -->
     <section class="marquee" aria-label="Informasi layanan">
       <div class="marquee-track">
         CUCI LIPAT (5K) <span>+</span>
@@ -130,6 +160,7 @@
       </div>
     </section>
 
+    <!-- SERVICES -->
     <section id="layanan" class="section">
       <div class="section-wrap">
         <div class="section-heading">
@@ -139,31 +170,77 @@
           </div>
 
           <p>
-            Pilih paket sesuai kecepatan yang kamu butuhkan: Reguler, Express 24 Jam, atau Express Kilat 6 Jam Kerja.
+            Pilih paket sesuai kecepatan yang kamu butuhkan: Reguler,
+            Express 24 Jam, atau Express Kilat 6 Jam Kerja.
           </p>
         </div>
 
-        <!-- Filter Kategori Layanan -->
-        <div class="service-tabs-wrap" role="tablist" aria-label="Kategori Layanan">
-          <button type="button" class="service-tab-btn active" data-filter="all">Semua Layanan (9)</button>
-          <button type="button" class="service-tab-btn" data-filter="reguler">🌿 Reguler</button>
-          <button type="button" class="service-tab-btn" data-filter="express-24">⚡ Express 24 Jam</button>
-          <button type="button" class="service-tab-btn" data-filter="express-6">🚀 Express 6 Jam Kerja</button>
+        <div
+          class="service-tabs-wrap"
+          role="group"
+          aria-label="Kategori layanan"
+        >
+          <button
+            type="button"
+            class="service-tab-btn active"
+            data-filter="all"
+          >
+            Semua Layanan (9)
+          </button>
+          <button
+            type="button"
+            class="service-tab-btn"
+            data-filter="reguler"
+          >
+            🌿 Reguler
+          </button>
+          <button
+            type="button"
+            class="service-tab-btn"
+            data-filter="express-24"
+          >
+            ⚡ Express 24 Jam
+          </button>
+          <button
+            type="button"
+            class="service-tab-btn"
+            data-filter="express-6"
+          >
+            🚀 Express 6 Jam Kerja
+          </button>
         </div>
 
         <div class="service-grid" id="serviceCardGrid">
-          <!-- ================= KATEGORI 1: REGULER ================= -->
-          <!-- 1. Cuci Lipat (Reguler) -->
-          <div class="service-card service-link-card" data-category="reguler" data-open-order="true" data-service="Cuci Lipat (Reguler)" role="button" tabindex="0">
+          <!-- 1. CUCI LIPAT REGULER -->
+          <div
+            class="service-card service-link-card"
+            data-category="reguler"
+            data-open-order="true"
+            data-service="Cuci Lipat (Reguler)"
+            role="button"
+            tabindex="0"
+          >
             <div class="card-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=700&q=80" alt="Cuci Lipat Reguler Yoga Laundry" class="card-thumb-img" loading="lazy">
+              <img
+                src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=700&q=80"
+                alt="Cuci Lipat Reguler Yoga Laundry"
+                class="card-thumb-img"
+                loading="lazy"
+              >
               <span class="card-badge badge-blue">🌿 REGULER</span>
-              <span class="card-price-pill">Rp5.000 <small>/kg</small></span>
+              <span class="card-price-pill">
+                Rp5.000 <small>/kg</small>
+              </span>
             </div>
+
             <div class="card-body">
               <span class="card-category">PAKET REGULER</span>
               <h3>Cuci Lipat</h3>
-              <p>Layanan pencucian pakaian hingga bersih dan wangi, dikeringkan, lalu dilipat rapi tanpa disetrika. Cocok untuk pakaian sehari-hari seperti kaos dan celana santai.</p>
+              <p>
+                Layanan pencucian pakaian hingga bersih dan wangi,
+                dikeringkan, lalu dilipat rapi tanpa disetrika. Cocok
+                untuk pakaian sehari-hari seperti kaos dan celana santai.
+              </p>
               <ul class="card-perks">
                 <li><span class="perk-check">✓</span> Cuci bersih &amp; wangi segar</li>
                 <li><span class="perk-check">✓</span> Pengeringan tuntas 100%</li>
@@ -176,17 +253,35 @@
             </div>
           </div>
 
-          <!-- 2. Cuci Setrika (Reguler) -->
-          <div class="service-card service-link-card featured-service" data-category="reguler" data-open-order="true" data-service="Cuci Setrika (Reguler)" role="button" tabindex="0">
+          <!-- 2. CUCI SETRIKA REGULER -->
+          <div
+            class="service-card service-link-card featured-service"
+            data-category="reguler"
+            data-open-order="true"
+            data-service="Cuci Setrika (Reguler)"
+            role="button"
+            tabindex="0"
+          >
             <div class="card-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=700&q=80" alt="Cuci Setrika Reguler Yoga Laundry" class="card-thumb-img" loading="lazy">
+              <img
+                src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=700&q=80"
+                alt="Cuci Setrika Reguler Yoga Laundry"
+                class="card-thumb-img"
+                loading="lazy"
+              >
               <span class="card-badge badge-amber">⭐ PALING LARIS</span>
-              <span class="card-price-pill">Rp7.000 <small>/kg</small></span>
+              <span class="card-price-pill">
+                Rp7.000 <small>/kg</small>
+              </span>
             </div>
+
             <div class="card-body">
               <span class="card-category">BEST VALUE</span>
               <h3>Cuci Setrika</h3>
-              <p>Layanan perawatan pakaian lengkap mulai dari pencucian, pengeringan, penyetrikaan hingga rapi, dan pelipatan presisi.</p>
+              <p>
+                Layanan perawatan pakaian lengkap mulai dari pencucian,
+                pengeringan, penyetrikaan hingga rapi, dan pelipatan presisi.
+              </p>
               <ul class="card-perks">
                 <li><span class="perk-check">✓</span> Perawatan pakaian menyeluruh</li>
                 <li><span class="perk-check">✓</span> Setrika uap halus anti kusut</li>
@@ -199,17 +294,36 @@
             </div>
           </div>
 
-          <!-- 3. Setrika Saja (Reguler) -->
-          <div class="service-card service-link-card" data-category="reguler" data-open-order="true" data-service="Setrika Saja (Reguler)" role="button" tabindex="0">
+          <!-- 3. SETRIKA SAJA REGULER -->
+          <div
+            class="service-card service-link-card"
+            data-category="reguler"
+            data-open-order="true"
+            data-service="Setrika Saja (Reguler)"
+            role="button"
+            tabindex="0"
+          >
             <div class="card-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?auto=format&fit=crop&w=700&q=80" alt="Setrika Saja Reguler Yoga Laundry" class="card-thumb-img" loading="lazy">
+              <img
+                src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?auto=format&fit=crop&w=700&q=80"
+                alt="Setrika Saja Reguler Yoga Laundry"
+                class="card-thumb-img"
+                loading="lazy"
+              >
               <span class="card-badge badge-blue">🌿 REGULER</span>
-              <span class="card-price-pill">Rp5.000 <small>/kg</small></span>
+              <span class="card-price-pill">
+                Rp5.000 <small>/kg</small>
+              </span>
             </div>
+
             <div class="card-body">
               <span class="card-category">PAKET REGULER</span>
               <h3>Setrika Saja</h3>
-              <p>Layanan khusus penyetrikaan untuk pakaian yang sudah dicuci sendiri di rumah agar kembali halus, rapi, dan siap pakai.</p>
+              <p>
+                Layanan khusus penyetrikaan untuk pakaian yang sudah
+                dicuci sendiri di rumah agar kembali halus, rapi, dan
+                siap pakai.
+              </p>
               <ul class="card-perks">
                 <li><span class="perk-check">✓</span> Khusus pakaian sudah dicuci</li>
                 <li><span class="perk-check">✓</span> Uap panas pelindung serat kain</li>
@@ -222,18 +336,35 @@
             </div>
           </div>
 
-          <!-- ================= KATEGORI 2: EXPRESS 24 JAM ================= -->
-          <!-- 4. Cuci Lipat (Express 24 Jam) -->
-          <div class="service-card service-link-card" data-category="express-24" data-open-order="true" data-service="Cuci Lipat (Express 24 Jam)" role="button" tabindex="0">
+          <!-- 4. CUCI LIPAT EXPRESS 24 JAM -->
+          <div
+            class="service-card service-link-card"
+            data-category="express-24"
+            data-open-order="true"
+            data-service="Cuci Lipat (Express 24 Jam)"
+            role="button"
+            tabindex="0"
+          >
             <div class="card-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=700&q=80" alt="Cuci Lipat Express 24 Jam Yoga Laundry" class="card-thumb-img" loading="lazy">
+              <img
+                src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=700&q=80"
+                alt="Cuci Lipat Express 24 Jam Yoga Laundry"
+                class="card-thumb-img"
+                loading="lazy"
+              >
               <span class="card-badge badge-pink">⚡ 24 JAM KILAT</span>
-              <span class="card-price-pill">Rp7.000 <small>/kg</small></span>
+              <span class="card-price-pill">
+                Rp7.000 <small>/kg</small>
+              </span>
             </div>
+
             <div class="card-body">
               <span class="card-category">EXPRESS 24 JAM</span>
               <h3>Cuci Lipat</h3>
-              <p>Layanan cuci dan lipat pakaian dengan proses cepat yang siap diambil atau dikirim dalam waktu 24 jam.</p>
+              <p>
+                Layanan cuci dan lipat pakaian dengan proses cepat yang
+                siap diambil atau dikirim dalam waktu 24 jam.
+              </p>
               <ul class="card-perks">
                 <li><span class="perk-check">✓</span> Selesai tepat waktu 24 jam</li>
                 <li><span class="perk-check">✓</span> Cuci bersih tuntas &amp; higienis</li>
@@ -246,17 +377,35 @@
             </div>
           </div>
 
-          <!-- 5. Cuci Setrika (Express 24 Jam) -->
-          <div class="service-card service-link-card featured-service" data-category="express-24" data-open-order="true" data-service="Cuci Setrika (Express 24 Jam)" role="button" tabindex="0">
+          <!-- 5. CUCI SETRIKA EXPRESS 24 JAM -->
+          <div
+            class="service-card service-link-card featured-service"
+            data-category="express-24"
+            data-open-order="true"
+            data-service="Cuci Setrika (Express 24 Jam)"
+            role="button"
+            tabindex="0"
+          >
             <div class="card-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=700&q=80" alt="Cuci Setrika Express 24 Jam Yoga Laundry" class="card-thumb-img" loading="lazy">
+              <img
+                src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=700&q=80"
+                alt="Cuci Setrika Express 24 Jam Yoga Laundry"
+                class="card-thumb-img"
+                loading="lazy"
+              >
               <span class="card-badge badge-pink">⚡ FAVORIT 24 JAM</span>
-              <span class="card-price-pill">Rp10.000 <small>/kg</small></span>
+              <span class="card-price-pill">
+                Rp10.000 <small>/kg</small>
+              </span>
             </div>
+
             <div class="card-body">
               <span class="card-category">EXPRESS 24 JAM</span>
               <h3>Cuci Setrika</h3>
-              <p>Paket lengkap cuci, setrika rapi, dan lipat dengan estimasi pengerjaan kilat maksimal 24 jam.</p>
+              <p>
+                Paket lengkap cuci, setrika rapi, dan lipat dengan estimasi
+                pengerjaan kilat maksimal 24 jam.
+              </p>
               <ul class="card-perks">
                 <li><span class="perk-check">✓</span> Komplit Cuci + Setrika Licin</li>
                 <li><span class="perk-check">✓</span> Jaminan tuntas &le; 24 jam</li>
@@ -269,17 +418,35 @@
             </div>
           </div>
 
-          <!-- 6. Setrika Saja (Express 24 Jam) -->
-          <div class="service-card service-link-card" data-category="express-24" data-open-order="true" data-service="Setrika Saja (Express 24 Jam)" role="button" tabindex="0">
+          <!-- 6. SETRIKA SAJA EXPRESS 24 JAM -->
+          <div
+            class="service-card service-link-card"
+            data-category="express-24"
+            data-open-order="true"
+            data-service="Setrika Saja (Express 24 Jam)"
+            role="button"
+            tabindex="0"
+          >
             <div class="card-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?auto=format&fit=crop&w=700&q=80" alt="Setrika Saja Express 24 Jam Yoga Laundry" class="card-thumb-img" loading="lazy">
+              <img
+                src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?auto=format&fit=crop&w=700&q=80"
+                alt="Setrika Saja Express 24 Jam Yoga Laundry"
+                class="card-thumb-img"
+                loading="lazy"
+              >
               <span class="card-badge badge-pink">⚡ 24 JAM KILAT</span>
-              <span class="card-price-pill">Rp7.000 <small>/kg</small></span>
+              <span class="card-price-pill">
+                Rp7.000 <small>/kg</small>
+              </span>
             </div>
+
             <div class="card-body">
               <span class="card-category">EXPRESS 24 JAM</span>
               <h3>Setrika Saja</h3>
-              <p>Layanan penyetrikaan pakaian kilat dengan kerapihan maksimal yang selesai dalam kurun waktu 24 jam.</p>
+              <p>
+                Layanan penyetrikaan pakaian kilat dengan kerapihan
+                maksimal yang selesai dalam kurun waktu 24 jam.
+              </p>
               <ul class="card-perks">
                 <li><span class="perk-check">✓</span> Penyetrikaan kilat 24 jam</li>
                 <li><span class="perk-check">✓</span> Kerapihan maksimal anti lecek</li>
@@ -292,18 +459,35 @@
             </div>
           </div>
 
-          <!-- ================= KATEGORI 3: EXPRESS 6 JAM KERJA ================= -->
-          <!-- 7. Cuci Lipat (Express 6 Jam Kerja) -->
-          <div class="service-card service-link-card" data-category="express-6" data-open-order="true" data-service="Cuci Lipat (Express 6 Jam)" role="button" tabindex="0">
+          <!-- 7. CUCI LIPAT EXPRESS 6 JAM -->
+          <div
+            class="service-card service-link-card"
+            data-category="express-6"
+            data-open-order="true"
+            data-service="Cuci Lipat (Express 6 Jam)"
+            role="button"
+            tabindex="0"
+          >
             <div class="card-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=700&q=80" alt="Cuci Lipat Express 6 Jam Kerja Yoga Laundry" class="card-thumb-img" loading="lazy">
+              <img
+                src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=700&q=80"
+                alt="Cuci Lipat Express 6 Jam Kerja Yoga Laundry"
+                class="card-thumb-img"
+                loading="lazy"
+              >
               <span class="card-badge badge-green">🚀 6 JAM KERJA</span>
-              <span class="card-price-pill">Rp10.000 <small>/kg</small></span>
+              <span class="card-price-pill">
+                Rp10.000 <small>/kg</small>
+              </span>
             </div>
+
             <div class="card-body">
               <span class="card-category">SUPER KILAT 6 JAM</span>
               <h3>Cuci Lipat</h3>
-              <p>Layanan pencucian dan pelipatan super kilat prioritas tinggi yang diproses langsung dan selesai dalam 6 jam kerja.</p>
+              <p>
+                Layanan pencucian dan pelipatan super kilat prioritas
+                tinggi yang diproses langsung dan selesai dalam 6 jam kerja.
+              </p>
               <ul class="card-perks">
                 <li><span class="perk-check">✓</span> Diproses langsung tanpa antre</li>
                 <li><span class="perk-check">✓</span> Selesai kilat 6 jam kerja</li>
@@ -316,17 +500,36 @@
             </div>
           </div>
 
-          <!-- 8. Cuci Setrika (Express 6 Jam Kerja) -->
-          <div class="service-card service-link-card featured-service" data-category="express-6" data-open-order="true" data-service="Cuci Setrika (Express 6 Jam)" role="button" tabindex="0">
+          <!-- 8. CUCI SETRIKA EXPRESS 6 JAM -->
+          <div
+            class="service-card service-link-card featured-service"
+            data-category="express-6"
+            data-open-order="true"
+            data-service="Cuci Setrika (Express 6 Jam)"
+            role="button"
+            tabindex="0"
+          >
             <div class="card-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=700&q=80" alt="Cuci Setrika Express 6 Jam Kerja Yoga Laundry" class="card-thumb-img" loading="lazy">
+              <img
+                src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=700&q=80"
+                alt="Cuci Setrika Express 6 Jam Kerja Yoga Laundry"
+                class="card-thumb-img"
+                loading="lazy"
+              >
               <span class="card-badge badge-green">👑 SUPER KILAT 6 JAM</span>
-              <span class="card-price-pill">Rp14.000 <small>/kg</small></span>
+              <span class="card-price-pill">
+                Rp14.000 <small>/kg</small>
+              </span>
             </div>
+
             <div class="card-body">
               <span class="card-category">PREMIUM PRIORITAS</span>
               <h3>Cuci Setrika</h3>
-              <p>Layanan pembersihan dan perawatan premium paling cepat; pakaian dicuci, disetrika halus, dan dilipat rapi dalam waktu 6 jam kerja.</p>
+              <p>
+                Layanan pembersihan dan perawatan premium paling cepat;
+                pakaian dicuci, disetrika halus, dan dilipat rapi dalam
+                waktu 6 jam kerja.
+              </p>
               <ul class="card-perks">
                 <li><span class="perk-check">✓</span> Perawatan premium paling cepat</li>
                 <li><span class="perk-check">✓</span> Cuci + Setrika uap halus 6 jam</li>
@@ -339,17 +542,35 @@
             </div>
           </div>
 
-          <!-- 9. Setrika Saja (Express 6 Jam Kerja) -->
-          <div class="service-card service-link-card" data-category="express-6" data-open-order="true" data-service="Setrika Saja (Express 6 Jam)" role="button" tabindex="0">
+          <!-- 9. SETRIKA SAJA EXPRESS 6 JAM -->
+          <div
+            class="service-card service-link-card"
+            data-category="express-6"
+            data-open-order="true"
+            data-service="Setrika Saja (Express 6 Jam)"
+            role="button"
+            tabindex="0"
+          >
             <div class="card-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?auto=format&fit=crop&w=700&q=80" alt="Setrika Saja Express 6 Jam Kerja Yoga Laundry" class="card-thumb-img" loading="lazy">
+              <img
+                src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?auto=format&fit=crop&w=700&q=80"
+                alt="Setrika Saja Express 6 Jam Kerja Yoga Laundry"
+                class="card-thumb-img"
+                loading="lazy"
+              >
               <span class="card-badge badge-green">🚀 6 JAM KERJA</span>
-              <span class="card-price-pill">Rp10.000 <small>/kg</small></span>
+              <span class="card-price-pill">
+                Rp10.000 <small>/kg</small>
+              </span>
             </div>
+
             <div class="card-body">
               <span class="card-category">SUPER KILAT 6 JAM</span>
               <h3>Setrika Saja</h3>
-              <p>Layanan penyetrikaan instant prioritas utama untuk pakaian halus dan bebas kusut dalam 6 jam kerja.</p>
+              <p>
+                Layanan penyetrikaan instant prioritas utama untuk
+                pakaian halus dan bebas kusut dalam 6 jam kerja.
+              </p>
               <ul class="card-perks">
                 <li><span class="perk-check">✓</span> Penyetrikaan instant prioritas</li>
                 <li><span class="perk-check">✓</span> Halus &amp; bebas kusut 6 jam kerja</li>
@@ -365,6 +586,7 @@
       </div>
     </section>
 
+    <!-- CARA KERJA -->
     <section id="cara-kerja" class="section process-section">
       <div class="section-wrap">
         <div class="section-heading">
@@ -372,10 +594,9 @@
             <p class="eyebrow">Semudah kirim chat</p>
             <h2>Tiga langkah.<br>Cucian beres.</h2>
           </div>
-
           <p>
-            Tidak perlu antre. Kami bantu dari penjemputan sampai cucian kembali
-            ke tanganmu.
+            Tidak perlu antre. Kami bantu dari penjemputan sampai cucian
+            kembali ke tanganmu.
           </p>
         </div>
 
@@ -395,12 +616,15 @@
           <article class="step">
             <span class="step-number">03 / SIAP DIPAKAI</span>
             <h3>Terima</h3>
-            <p>Cucian bersih, wangi, dan rapi kami antar kembali kepadamu.</p>
+            <p>
+              Cucian bersih, wangi, dan rapi kami antar kembali kepadamu.
+            </p>
           </article>
         </div>
       </div>
     </section>
 
+    <!-- KONTAK -->
     <section id="pesan" class="section order-section">
       <div class="section-wrap order-grid">
         <div class="order-copy">
@@ -408,19 +632,23 @@
           <h2>Cucian numpuk?<br>Kirim ke Yoga.</h2>
 
           <p>
-            Klik tombol di bawah untuk langsung chat dengan tim Yoga Laundry.
-            Kami siap membantu pesanan, pertanyaan harga, dan antar-jemput cucian.
+            Klik tombol di bawah untuk langsung chat dengan tim Yoga
+            Laundry. Kami siap membantu pesanan, pertanyaan harga, dan
+            antar-jemput cucian.
           </p>
 
-          <a class="whatsapp-direct-button"
+          <a
+            class="whatsapp-direct-button"
             href="https://wa.me/6282320565949?text=Halo%20Yoga%20Laundry%2C%20saya%20ingin%20memesan%20layanan%20laundry."
-            target="_blank" rel="noopener noreferrer">
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span class="whatsapp-icon">WA</span>
             <span>
               <small>PESAN LANGSUNG VIA</small>
               WHATSAPP YOGA LAUNDRY
             </span>
-            <b>-></b>
+            <b>→</b>
           </a>
 
           <ul class="contact-list">
@@ -432,6 +660,7 @@
       </div>
     </section>
 
+    <!-- LOKASI -->
     <section id="lokasi" class="location-section">
       <div class="location-wrap">
         <div class="location-copy">
@@ -439,8 +668,8 @@
           <h2>Yoga Laundry<br>dekat dari kamu.</h2>
 
           <p>
-            Kamu juga bisa mengantar cucian langsung ke tempat kami. Klik tombol
-            di bawah untuk membuka rute di Google Maps.
+            Kamu juga bisa mengantar cucian langsung ke tempat kami.
+            Klik tombol di bawah untuk membuka rute di Google Maps.
           </p>
 
           <div class="location-info">
@@ -448,18 +677,21 @@
               <span>JAM OPERASIONAL</span>
               <strong>Setiap hari, 08.00 - 23.00 WIB</strong>
             </div>
-
             <div>
               <span>LAYANAN</span>
               <strong>Terima antar dan jemput cucian</strong>
             </div>
           </div>
 
-          <a class="map-button" href="https://maps.app.goo.gl/6UXCU31bJ73kN5bC8?g_st=ac" target="_blank"
-            rel="noopener noreferrer">
+          <a
+            class="map-button"
+            href="https://maps.app.goo.gl/6UXCU31bJ73kN5bC8?g_st=ac"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span class="map-pin">📍</span>
             <span>BUKA LOKASI DI GOOGLE MAPS</span>
-            <b>-></b>
+            <b>→</b>
           </a>
         </div>
 
@@ -467,15 +699,21 @@
           <div class="map-orbit orbit-one"></div>
           <div class="map-orbit orbit-two"></div>
 
-          <a class="map-card-modern map-card-interactive" href="https://maps.app.goo.gl/6UXCU31bJ73kN5bC8?g_st=ac"
-            target="_blank" rel="noopener noreferrer">
+          <a
+            class="map-card-modern map-card-interactive"
+            href="https://maps.app.goo.gl/6UXCU31bJ73kN5bC8?g_st=ac"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <div class="map-card-top">
               <span class="map-app-icon">📍</span>
               <span>
                 YOGA LAUNDRY<br>
                 <small>KLIK UNTUK PETUNJUK RUTE</small>
               </span>
-              <span class="map-live-badge"><i class="map-live-dot"></i> BUKA</span>
+              <span class="map-live-badge">
+                <i class="map-live-dot"></i> BUKA
+              </span>
             </div>
 
             <div class="map-canvas">
@@ -488,12 +726,10 @@
               <div class="map-street street-two"></div>
               <div class="map-street street-three"></div>
 
-              <!-- Rute Antar-Jemput yang Aktif -->
               <div class="map-route">
                 <span class="route-runner"></span>
               </div>
 
-              <!-- Pin Lokasi dengan Radar Berdenyut -->
               <div class="location-marker">
                 <div class="radar-pulse"></div>
                 <div class="radar-pulse pulse-delay"></div>
@@ -512,17 +748,23 @@
     </section>
   </main>
 
+  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="footer-wrap">
       <span>YOGA LAUNDRY / BERSIH TANPA RIBET</span>
-      <a href="admin.html" class="footer-admin-link" target="_blank">🔐 Panel Admin Toko</a>
+      <a
+        href="admin.html"
+        class="footer-admin-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        🔐 Panel Admin Toko
+      </a>
       <span>2026 - ALL RIGHTS RESERVED</span>
     </div>
   </footer>
 
-  <!-- ===================================================
-       MODAL: FORMULIR PEMESANAN ONLINE (AUTO LOG TO STORAGE)
-       =================================================== -->
+  <!-- MODAL PEMESANAN -->
   <div id="orderModal" class="site-modal" style="display: none;">
     <div class="site-modal-dialog">
       <div class="site-modal-header">
@@ -530,53 +772,101 @@
           <span class="modal-eyebrow">PESAN ANTAR-JEMPUT</span>
           <h3>Formulir Cucian Yoga Laundry</h3>
         </div>
-        <button type="button" class="btn-close-site-modal" id="btnCloseOrderModal">&times;</button>
+        <button
+          type="button"
+          class="btn-close-site-modal"
+          id="btnCloseOrderModal"
+          aria-label="Tutup formulir pesanan"
+        >&times;</button>
       </div>
 
       <form id="orderForm" class="site-modal-body form-grid-customer">
         <div class="form-group-customer">
           <label for="custName">Nama Pemesan *</label>
-          <input type="text" id="custName" required placeholder="Contoh: Yoga Pratama">
+          <input
+            type="text"
+            id="custName"
+            required
+            autocomplete="name"
+            placeholder="Contoh: Yoga Pratama"
+          >
         </div>
 
         <div class="form-group-customer">
           <label for="custPhone">No. WhatsApp Aktif *</label>
-          <input type="tel" id="custPhone" required placeholder="Contoh: 082320565949">
+          <input
+            type="tel"
+            id="custPhone"
+            required
+            autocomplete="tel"
+            placeholder="Contoh: 082320565949"
+          >
         </div>
 
-        <!-- LOCATION PICKER BLOCK -->
+        <!-- LOKASI PENJEMPUTAN -->
         <div class="form-group-customer full-span">
-          <label>📍 Lokasi Penjemputan *</label>
+          <label for="btnGetLocation">📍 Lokasi Penjemputan *</label>
 
-          <!-- GPS Button -->
-          <button type="button" id="btnGetLocation" class="btn-get-location">
+          <button
+            type="button"
+            id="btnGetLocation"
+            class="btn-get-location"
+          >
             <span class="btn-loc-icon">📍</span>
-            <span id="btnGetLocationText">Gunakan Lokasi GPS Saya (Otomatis)</span>
-            <span class="btn-loc-badge" id="locStatusBadge" style="display:none;"></span>
+            <span id="btnGetLocationText">
+              Gunakan Lokasi GPS Saya (Otomatis)
+            </span>
+            <span
+              class="btn-loc-badge"
+              id="locStatusBadge"
+              style="display: none;"
+            ></span>
           </button>
 
-          <!-- Location Preview Card (muncul setelah GPS berhasil) -->
-          <div id="locationPreviewCard" class="location-preview-card" style="display:none;">
+          <div
+            id="locationPreviewCard"
+            class="location-preview-card"
+            style="display: none;"
+          >
             <div class="loc-preview-row">
               <span class="loc-preview-pin">📍</span>
               <div class="loc-preview-info">
-                <span class="loc-preview-address" id="locPreviewAddress">Mendeteksi alamat...</span>
-                <div class="loc-preview-coords" id="locPreviewCoords"></div>
+                <span
+                  class="loc-preview-address"
+                  id="locPreviewAddress"
+                >
+                  Mendeteksi alamat...
+                </span>
+                <div
+                  class="loc-preview-coords"
+                  id="locPreviewCoords"
+                ></div>
               </div>
-              <a id="locPreviewMapLink" href="#" target="_blank" rel="noopener" class="loc-preview-map-btn">
+              <a
+                id="locPreviewMapLink"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="loc-preview-map-btn"
+              >
                 Buka Maps ↗
               </a>
             </div>
           </div>
 
-          <!-- Manual Address textarea (alternatif / isi detail tambahan) -->
-          <label for="custAddress" style="margin-top: 10px; color: var(--muted); font-size: 10px; letter-spacing: 0.06em;">
-            DETAIL ALAMAT / PATOKAN TAMBAHAN (Opsional jika sudah pakai GPS)
+          <label
+            for="custAddress"
+            style="margin-top: 10px; color: var(--muted); font-size: 10px; letter-spacing: 0.06em;"
+          >
+            DETAIL ALAMAT / PATOKAN TAMBAHAN
+            (Opsional jika sudah pakai GPS)
           </label>
-          <textarea id="custAddress" rows="2"
-            placeholder="Misal: Depan warung Bu Yati, pagar besi hitam, intercom kanan"></textarea>
+          <textarea
+            id="custAddress"
+            rows="2"
+            placeholder="Misal: Depan warung Bu Yati, pagar besi hitam, intercom kanan"
+          ></textarea>
 
-          <!-- Hidden inputs untuk menyimpan data GPS -->
           <input type="hidden" id="custLat">
           <input type="hidden" id="custLng">
           <input type="hidden" id="custGmapsLink">
@@ -587,80 +877,144 @@
           <label for="custService">Pilih Paket Layanan *</label>
           <select id="custService" required>
             <optgroup label="── Kategori: Reguler ──">
-              <option value="Cuci Lipat (Reguler)">Cuci Lipat - Rp5.000 / kg</option>
-              <option value="Cuci Setrika (Reguler)" selected>Cuci Setrika - Rp7.000 / kg</option>
-              <option value="Setrika Saja (Reguler)">Setrika Saja - Rp5.000 / kg</option>
+              <option value="Cuci Lipat (Reguler)">
+                Cuci Lipat - Rp5.000 / kg
+              </option>
+              <option value="Cuci Setrika (Reguler)" selected>
+                Cuci Setrika - Rp7.000 / kg
+              </option>
+              <option value="Setrika Saja (Reguler)">
+                Setrika Saja - Rp5.000 / kg
+              </option>
             </optgroup>
+
             <optgroup label="── Kategori: Express 24 Jam ──">
-              <option value="Cuci Lipat (Express 24 Jam)">Cuci Lipat (24 Jam) - Rp7.000 / kg</option>
-              <option value="Cuci Setrika (Express 24 Jam)">Cuci Setrika (24 Jam) - Rp10.000 / kg</option>
-              <option value="Setrika Saja (Express 24 Jam)">Setrika Saja (24 Jam) - Rp7.000 / kg</option>
+              <option value="Cuci Lipat (Express 24 Jam)">
+                Cuci Lipat (24 Jam) - Rp7.000 / kg
+              </option>
+              <option value="Cuci Setrika (Express 24 Jam)">
+                Cuci Setrika (24 Jam) - Rp10.000 / kg
+              </option>
+              <option value="Setrika Saja (Express 24 Jam)">
+                Setrika Saja (24 Jam) - Rp7.000 / kg
+              </option>
             </optgroup>
+
             <optgroup label="── Kategori: Express 6 Jam Kerja ──">
-              <option value="Cuci Lipat (Express 6 Jam)">Cuci Lipat (6 Jam) - Rp10.000 / kg</option>
-              <option value="Cuci Setrika (Express 6 Jam)">Cuci Setrika (6 Jam) - Rp14.000 / kg</option>
-              <option value="Setrika Saja (Express 6 Jam)">Setrika Saja (6 Jam) - Rp10.000 / kg</option>
+              <option value="Cuci Lipat (Express 6 Jam)">
+                Cuci Lipat (6 Jam) - Rp10.000 / kg
+              </option>
+              <option value="Cuci Setrika (Express 6 Jam)">
+                Cuci Setrika (6 Jam) - Rp14.000 / kg
+              </option>
+              <option value="Setrika Saja (Express 6 Jam)">
+                Setrika Saja (6 Jam) - Rp10.000 / kg
+              </option>
             </optgroup>
           </select>
         </div>
 
         <div class="form-group-customer">
           <label for="custWeight">Estimasi Berat / Jumlah Cucian</label>
-          <input type="text" id="custWeight" placeholder="Misal: 4 kg atau 1 Bed Cover King">
+          <input
+            type="text"
+            id="custWeight"
+            placeholder="Misal: 4 kg atau 1 Bed Cover King"
+          >
         </div>
 
         <div class="form-group-customer full-span">
           <label for="custNote">Catatan Khusus (Opsional)</label>
-          <input type="text" id="custNote" placeholder="Misal: Jangan pakai pemutih, pisahkan kemeja putih">
+          <input
+            type="text"
+            id="custNote"
+            placeholder="Misal: Jangan pakai pemutih, pisahkan kemeja putih"
+          >
         </div>
 
         <div class="site-modal-footer full-span">
-          <button type="submit" class="btn-submit-order" id="btnSubmitOrder">
+          <button
+            type="submit"
+            class="btn-submit-order"
+            id="btnSubmitOrder"
+          >
             KONFIRMASI &amp; BUAT STRUK PESANAN ➔
           </button>
-          <p class="loc-required-hint" id="locRequiredHint" style="display:none;">
-            ⚠️ Silakan bagikan lokasi GPS Anda terlebih dahulu sebelum konfirmasi pesanan.
+
+          <p
+            class="loc-required-hint"
+            id="locRequiredHint"
+            style="display: none;"
+          >
+            Silakan bagikan lokasi GPS atau ketik alamat penjemputan
+            sebelum konfirmasi pesanan.
           </p>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- ===================================================
-       MODAL: STRUK DIGITAL PELANGGAN (OFFICIAL RECEIPT)
-       =================================================== -->
-  <div id="customerReceiptModal" class="site-modal" style="display: none;">
+  <!-- MODAL STRUK PELANGGAN -->
+  <div
+    id="customerReceiptModal"
+    class="site-modal"
+    style="display: none;"
+  >
     <div class="site-modal-dialog receipt-dialog">
       <div class="site-modal-header">
         <div>
-          <span class="modal-eyebrow" style="color: #16a34a;">PESANAN BERHASIL DIBUAT</span>
+          <span class="modal-eyebrow" style="color: #16a34a;">
+            PESANAN BERHASIL DIBUAT
+          </span>
           <h3>Struk Resmi Yoga Laundry</h3>
         </div>
-        <button type="button" class="btn-close-site-modal" id="btnCloseCustReceipt">&times;</button>
+        <button
+          type="button"
+          class="btn-close-site-modal"
+          id="btnCloseCustReceipt"
+          aria-label="Tutup struk"
+        >&times;</button>
       </div>
 
       <div class="site-modal-body">
         <div id="custReceiptPrintArea" class="cust-receipt-paper">
-          <!-- Rendered via JS -->
+          <!-- Diisi oleh style.js -->
         </div>
       </div>
 
       <div class="site-modal-footer receipt-footer-actions">
-        <a id="btnSendWaReceipt" class="btn-wa-receipt" href="#" target="_blank" rel="noopener">
+        <a
+          id="btnSendWaReceipt"
+          class="btn-wa-receipt"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <span>📲 KIRIM STRUK KE WHATSAPP ADMIN</span>
           <small>Langsung konfirmasi penjemputan</small>
         </a>
+
         <div class="secondary-receipt-btns">
-          <button type="button" id="btnPrintCustReceipt" class="btn-print-receipt">🖨 Cetak Struk</button>
-          <button type="button" id="btnCloseCustReceipt2" class="btn-close-receipt">Tutup</button>
+          <button
+            type="button"
+            id="btnPrintCustReceipt"
+            class="btn-print-receipt"
+          >
+            🖨 Cetak Struk
+          </button>
+          <button
+            type="button"
+            id="btnCloseCustReceipt2"
+            class="btn-close-receipt"
+          >
+            Tutup
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ===================================================
-       MODAL: CEK RESI / STATUS PESANAN PELANGGAN
-       =================================================== -->
+  <!-- MODAL CEK RESI -->
   <div id="trackingModal" class="site-modal" style="display: none;">
     <div class="site-modal-dialog">
       <div class="site-modal-header">
@@ -668,17 +1022,38 @@
           <span class="modal-eyebrow">LACAK STATUS CUCIAN</span>
           <h3>Cek Status Resi</h3>
         </div>
-        <button type="button" class="btn-close-site-modal" id="btnCloseTracking">&times;</button>
+        <button
+          type="button"
+          class="btn-close-site-modal"
+          id="btnCloseTracking"
+          aria-label="Tutup cek resi"
+        >&times;</button>
       </div>
 
       <div class="site-modal-body">
         <div class="tracking-search-bar">
-          <input type="text" id="trackingInput" placeholder="Masukkan Nomor Resi (Contoh: YG-0511-101)">
-          <button type="button" id="btnSubmitTracking" class="btn-submit-tracking">CARI ➔</button>
+          <input
+            type="text"
+            id="trackingInput"
+            aria-label="Nomor resi pesanan"
+            placeholder="Masukkan nomor resi dari struk"
+          >
+          <button
+            type="button"
+            id="btnSubmitTracking"
+            class="btn-submit-tracking"
+          >
+            CARI ➔
+          </button>
         </div>
 
-        <div id="trackingResult" class="tracking-result-box" style="display: none;">
-          <!-- Rendered via JS -->
+        <div
+          id="trackingResult"
+          class="tracking-result-box"
+          style="display: none;"
+          aria-live="polite"
+        >
+          <!-- Diisi oleh style.js -->
         </div>
       </div>
     </div>
@@ -686,5 +1061,4 @@
 
   <script src="./style.js"></script>
 </body>
-
 </html>
