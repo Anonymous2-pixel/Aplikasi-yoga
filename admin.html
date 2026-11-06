@@ -160,6 +160,60 @@
           </span>
         </div>
       </section>
+      <!-- DASHBOARD PEMASUKAN ADMIN -->
+<section class="income-panel" aria-labelledby="incomeTitle">
+  <div class="income-heading">
+    <div>
+      <span class="income-eyebrow">REKAP KASIR</span>
+      <h2 id="incomeTitle">Pemasukan Laundry</h2>
+      <p>
+        Berdasarkan tagihan lunas yang tercatat dari kasir,
+        dikelompokkan menurut tanggal pesanan.
+      </p>
+    </div>
+  </div>
+
+  <div class="income-filters">
+    <div class="income-filter-field">
+      <label for="incomeDate">Pilih tanggal</label>
+      <input type="date" id="incomeDate">
+    </div>
+
+    <div class="income-filter-field">
+      <label for="incomeMonth">Pilih bulan rekap</label>
+      <input type="month" id="incomeMonth">
+    </div>
+  </div>
+
+  <div class="income-metrics">
+    <article class="income-metric">
+      <span id="incomeDayLabel">Pemasukan tanggal pilihan</span>
+      <strong id="incomeDayTotal">Rp0</strong>
+      <small id="incomeDayCount">0 pesanan lunas</small>
+    </article>
+
+    <article class="income-metric">
+      <span id="incomeMonthLabel">Pemasukan bulan pilihan</span>
+      <strong id="incomeMonthTotal">Rp0</strong>
+      <small id="incomeMonthCount">0 pesanan lunas</small>
+    </article>
+
+    <article class="income-metric">
+      <span>Akumulasi seluruh data lunas</span>
+      <strong id="incomeAllTotal">Rp0</strong>
+      <small id="incomeAllCount">0 pesanan lunas</small>
+    </article>
+  </div>
+
+  <div class="income-recap-heading">
+    <h3>Rincian per tanggal</h3>
+    <span id="incomeRecapPeriod"></span>
+  </div>
+
+  <div id="incomeDailyList" class="income-daily-list"></div>
+
+  <p id="incomeNotice" class="income-notice"></p>
+</section>
 
       <!-- PENCARIAN DAN FILTER -->
       <section class="toolbar" aria-label="Pencarian dan aksi pesanan">
