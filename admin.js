@@ -1,11 +1,11 @@
 // ===================================================
-// YOGA LAUNDRY - ADMIN DASHBOARD
+// YOGA LAUNDRY - ADMIN DASHBOARD & KASIR
 // ===================================================
 (() => {
   "use strict";
 
   const API_URL =
-  "https://script.google.com/macros/s/AKfycby-zjMOSm7k_GkQ9g5ZjbsZb9QC8t7iPyx9ajPD7biuIwn6giuNtWTSoEA_werYeuTq_Q/exec";
+    "https://script.google.com/macros/s/AKfycby-zjMOSm7k_GkQ9g5ZjbsZb9QC8t7iPyx9ajPD7biuIwn6giuNtWTSoEA_werYeuTq_Q/exec";
 
   const SESSION_KEY = "yoga_admin_pin_v2";
 
@@ -18,6 +18,22 @@
     "Selesai",
     "Dibatalkan"
   ];
+
+  const SERVICE_RATES = {
+    "Cuci Lipat (Reguler)": 5000,
+    "Cuci Setrika (Reguler)": 7000,
+    "Setrika Saja (Reguler)": 5000,
+
+    "Cuci Lipat (Express 24 Jam)": 7000,
+    "Cuci Setrika (Express 24 Jam)": 10000,
+    "Setrika Saja (Express 24 Jam)": 7000,
+
+    "Cuci Lipat (Express 6 Jam)": 10000,
+    "Cuci Setrika (Express 6 Jam)": 14000,
+    "Setrika Saja (Express 6 Jam)": 10000
+  };
+
+  const PAYMENT_MARKER = "=== PEMBAYARAN KASIR ===";
 
   function init() {
     const $ = selector => document.querySelector(selector);
@@ -42,12 +58,18 @@
 
     let orders = [];
     let adminPin = "";
+
     let loading = false;
     let writing = false;
     let loggingIn = false;
+    let manualSubmitting = false;
+
     let pendingManualOrder = null;
     let pendingManualSignature = "";
 
+    // ===================================================
+    // GENERAL HELPERS
+    // ===================================================
     function escapeHtml(value) {
       return String(value ?? "")
         .replace(/&/g, "&amp;")
@@ -74,6 +96,78 @@
       if (element) element.textContent = text;
     }
 
+    function isBusy() {
+      return loading || writing || manualSubmitting;
+    }
+
+    function rupiah(amount) {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function priceFor(service) {
+      const rate = SERVICE_RATES[service];
+
+      return rate
+        ? `${rupiah(rate)} / kg`
+        : "Sesuai Timbangan";
+    }
+
+    function newId() {
+      const suffix = globalThis.crypto?.randomUUID
+        ? globalThis.crypto
+            .randomUUID()
+            .replace(/-/g, "")
+            .slice(0, 12)
+        : Date.now().toString(36) +
+          Math.random().toString(36).slice(2, 8);
+
+      return `YG-${Date.now().toString(36)}-${suffix}`
+        .toUpperCase();
+    }
+
+    function orderTime() {
+      return new Date().toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }) + " WIB";
+    }
+
+    function findOrder(id) {
+      return orders.find(
+        order => String(order.id) === String(id)
+      );
+    }
+
+    function splitPaymentNote(note) {
+      const text = String(note || "");
+      const index = text.indexOf(PAYMENT_MARKER);
+
+      if (index < 0) {
+        return {
+          customerNote: text,
+          paymentText: ""
+        };
+      }
+
+      return {
+        customerNote: text.slice(0, index).trim(),
+        paymentText: text.slice(
+          index + PAYMENT_MARKER.length
+        ).trim()
+      };
+    }
+
+    // ===================================================
+    // SESSION
+    // ===================================================
     function getSessionPin() {
       try {
         return sessionStorage.getItem(SESSION_KEY) || "";
@@ -90,16 +184,29 @@
           sessionStorage.removeItem(SESSION_KEY);
         }
 
-        // Hapus penanda login versi lama.
         sessionStorage.removeItem("yoga_admin_auth");
       } catch (error) {
-        console.warn("Penyimpanan sesi tidak tersedia:", error);
+        console.warn(
+          "Penyimpanan sesi tidak tersedia:",
+          error
+        );
       }
     }
 
-    async function api(action, payload = {}, pin = adminPin) {
+    // ===================================================
+    // DATABASE API
+    // ===================================================
+    async function api(
+      action,
+      payload = {},
+      pin = adminPin
+    ) {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 30000);
+
+      const timer = setTimeout(
+        () => controller.abort(),
+        30000
+      );
 
       try {
         const response = await fetch(API_URL, {
@@ -117,7 +224,9 @@
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+          throw new Error(
+            `Server mengembalikan HTTP ${response.status}.`
+          );
         }
 
         let data;
@@ -130,9 +239,10 @@
           );
         }
 
-        if (data.ok !== true) {
+        if (!data || data.ok !== true) {
           throw new Error(
-            data.message || "Database belum mengonfirmasi permintaan."
+            data?.message ||
+            "Database belum mengonfirmasi permintaan."
           );
         }
 
@@ -140,7 +250,8 @@
       } catch (error) {
         if (error.name === "AbortError") {
           throw new Error(
-            "Waktu tunggu habis. Muat ulang data sebelum mengulangi perubahan."
+            "Waktu tunggu habis. Status perubahan belum dapat " +
+            "dipastikan. Muat ulang data sebelum mencoba lagi."
           );
         }
 
@@ -156,6 +267,10 @@
     function showLogin() {
       adminPin = "";
       orders = [];
+
+      pendingManualOrder = null;
+      pendingManualSignature = "";
+
       rememberPin("");
 
       hide(adminApp);
@@ -164,6 +279,10 @@
       hide(manualModal);
 
       if (tableBody) tableBody.innerHTML = "";
+      if (receiptPrintArea) receiptPrintArea.innerHTML = "";
+
+      manualOrderForm?.reset();
+
       if (adminPinInput) {
         adminPinInput.value = "";
         adminPinInput.focus();
@@ -177,13 +296,18 @@
 
     loginForm?.addEventListener("submit", async event => {
       event.preventDefault();
+
       if (loggingIn) return;
 
       const pin = value("#adminPin");
       if (!pin) return;
 
       loggingIn = true;
-      const button = loginForm.querySelector('[type="submit"]');
+
+      const button = loginForm.querySelector(
+        '[type="submit"]'
+      );
+
       if (button) button.disabled = true;
       if (loginError) loginError.style.display = "none";
 
@@ -192,7 +316,8 @@
 
         adminPin = pin;
         rememberPin(pin);
-        adminPinInput.value = "";
+
+        if (adminPinInput) adminPinInput.value = "";
 
         showAdmin();
         await loadOrders(true);
@@ -210,8 +335,10 @@
     });
 
     $("#btnLogout")?.addEventListener("click", () => {
-      if (writing || loading) {
-        alert("Tunggu proses database selesai terlebih dahulu.");
+      if (isBusy()) {
+        alert(
+          "Tunggu proses database selesai terlebih dahulu."
+        );
         return;
       }
 
@@ -224,7 +351,7 @@
     // LOAD DATABASE
     // ===================================================
     async function loadOrders(notify = true) {
-      if (!adminPin || loading || writing) return;
+      if (!adminPin || loading || writing) return false;
 
       loading = true;
 
@@ -235,16 +362,27 @@
 
       renderDashboard();
 
+      let success = false;
+
       try {
         const data = await api("adminOrders");
 
         if (!Array.isArray(data.orders)) {
-          throw new Error("Format daftar pesanan tidak sesuai.");
+          throw new Error(
+            "Format daftar pesanan tidak sesuai."
+          );
         }
 
-        orders = data.orders.filter(order => order && order.id);
+        orders = data.orders.filter(
+          order => order && order.id
+        );
+
+        success = true;
       } catch (error) {
-        console.error("Gagal memuat pesanan:", error);
+        console.error(
+          "Gagal memuat pesanan:",
+          error
+        );
 
         if (notify) {
           alert(
@@ -263,6 +401,8 @@
 
         renderDashboard();
       }
+
+      return success;
     }
 
     // ===================================================
@@ -283,6 +423,9 @@
     updateClock();
     setInterval(updateClock, 1000);
 
+    // ===================================================
+    // STATUS / MAP HELPERS
+    // ===================================================
     function getStatusClass(status) {
       const classes = {
         "Menunggu Penjemputan": "status-pending",
@@ -313,17 +456,25 @@
           Math.abs(lat) <= 90 &&
           Math.abs(lng) <= 180
         ) {
-          return `https://www.google.com/maps?q=${lat},${lng}`;
+          return (
+            "https://www.google.com/maps?q=" +
+            `${lat},${lng}`
+          );
         }
       }
 
       try {
-        const url = new URL(String(order.gmapsLink || ""));
+        const url = new URL(
+          String(order.gmapsLink || "")
+        );
 
         if (
           url.protocol === "https:" &&
-          ["www.google.com", "maps.google.com", "maps.app.goo.gl"]
-            .includes(url.hostname)
+          [
+            "www.google.com",
+            "maps.google.com",
+            "maps.app.goo.gl"
+          ].includes(url.hostname)
         ) {
           return url.href;
         }
@@ -333,46 +484,64 @@
     }
 
     // ===================================================
-    // TABLE AND METRICS
+    // DASHBOARD / TABLE
     // ===================================================
     function renderDashboard() {
       setText("#metricTotal", orders.length);
+
       setText(
         "#metricPending",
-        orders.filter(o => o.status === "Menunggu Penjemputan").length
+        orders.filter(
+          order =>
+            order.status === "Menunggu Penjemputan"
+        ).length
       );
+
       setText(
         "#metricProcess",
-        orders.filter(o =>
+        orders.filter(order =>
           [
             "Sedang Dijemput",
             "Sedang Dicuci",
             "Sedang Disetrika",
             "Siap Diantar"
-          ].includes(o.status)
+          ].includes(order.status)
         ).length
       );
+
       setText(
         "#metricCompleted",
-        orders.filter(o => o.status === "Selesai").length
+        orders.filter(
+          order => order.status === "Selesai"
+        ).length
       );
 
       if (!tableBody) return;
 
-      const search = value("#searchInput").toLowerCase();
+      const search = value(
+        "#searchInput"
+      ).toLowerCase();
+
       const filter = filterStatus?.value || "ALL";
 
       const filtered = orders.filter(order => {
         const matchesSearch = [
-          "id", "name", "phone", "address", "service"
+          "id",
+          "name",
+          "phone",
+          "address",
+          "service"
         ].some(key =>
-          String(order[key] ?? "").toLowerCase().includes(search)
+          String(order[key] ?? "")
+            .toLowerCase()
+            .includes(search)
         );
 
-        return (
-          matchesSearch &&
-          (filter === "ALL" || order.status === filter)
-        );
+        const matchesStatus =
+          filter === "ALL" ||
+          order.status === filter;
+
+        return matchesSearch && matchesStatus;
       });
 
       if (!filtered.length) {
@@ -380,6 +549,7 @@
 
         if (emptyState) {
           emptyState.style.display = "block";
+
           emptyState.textContent = loading
             ? "Sedang mengambil data dari Google Sheets..."
             : "Tidak ada pesanan yang cocok.";
@@ -388,23 +558,30 @@
         return;
       }
 
-      if (emptyState) emptyState.style.display = "none";
+      if (emptyState) {
+        emptyState.style.display = "none";
+      }
 
       tableBody.innerHTML = filtered.map(order => {
         const id = escapeHtml(order.id);
         const phone = String(order.phone || "");
         const digits = phone.replace(/\D/g, "");
+
         const waNumber = digits.startsWith("0")
           ? "62" + digits.slice(1)
           : digits;
 
         const waText = encodeURIComponent(
-          `Halo Kak ${order.name}, update pesanan Yoga Laundry ` +
-          `#${order.id}: status saat ini ${order.status}.`
+          `Halo Kak ${order.name}, update pesanan ` +
+          `Yoga Laundry #${order.id}: status saat ini ` +
+          `${order.status}.`
         );
 
         const maps = mapLink(order);
-        const disabled = loading || writing ? "disabled" : "";
+
+        const disabled = isBusy()
+          ? "disabled"
+          : "";
 
         return `
           <tr data-id="${id}">
@@ -424,6 +601,7 @@
               <span class="cust-name">
                 ${escapeHtml(order.name)}
               </span>
+
               <a
                 class="cust-phone"
                 href="https://wa.me/${waNumber}"
@@ -434,14 +612,17 @@
 
             <td style="max-width:220px;font-size:12px;">
               ${escapeHtml(order.address)}
+
               ${
                 maps
-                  ? `<a
+                  ? `
+                    <a
                       href="${escapeHtml(maps)}"
                       class="admin-loc-link"
                       target="_blank"
                       rel="noopener noreferrer"
-                    >Buka di Maps</a>`
+                    >Buka di Maps</a>
+                  `
                   : ""
               }
             </td>
@@ -450,26 +631,36 @@
               <span class="order-service-name">
                 ${escapeHtml(order.service)}
               </span>
+
               <span class="order-weight">
                 ${escapeHtml(order.weight || "-")}
-                · ${escapeHtml(order.priceEstimate || "Tanya Harga")}
+                ·
+                ${escapeHtml(
+                  order.priceEstimate || "Tanya Harga"
+                )}
               </span>
             </td>
 
-            <td style="max-width:180px;font-size:11px;">
-              ${escapeHtml(order.note || "-")}
-            </td>
+            <td
+              style="max-width:180px;font-size:11px;white-space:pre-line;"
+            >${escapeHtml(order.note || "-")}</td>
 
             <td>
               <select
                 data-action="status"
-                class="status-dropdown ${getStatusClass(order.status)}"
+                class="status-dropdown ${getStatusClass(
+                  order.status
+                )}"
                 ${disabled}
               >
                 ${STATUSES.map(status => `
                   <option
                     value="${escapeHtml(status)}"
-                    ${order.status === status ? "selected" : ""}
+                    ${
+                      order.status === status
+                        ? "selected"
+                        : ""
+                    }
                   >${escapeHtml(status)}</option>
                 `).join("")}
               </select>
@@ -514,7 +705,9 @@
     // UPDATE / DELETE DATABASE
     // ===================================================
     async function mutate(action, payload) {
-      if (writing || loading || !adminPin) return false;
+      if (writing || loading || !adminPin) {
+        return false;
+      }
 
       writing = true;
       renderDashboard();
@@ -524,6 +717,31 @@
       try {
         await api(action, payload);
         success = true;
+
+        // Perbarui tampilan setelah server mengonfirmasi.
+        // Pengambilan ulang tetap dilakukan setelahnya.
+        if (action === "createOrder") {
+          const order = payload.order;
+
+          if (!findOrder(order.id)) {
+            orders.unshift(order);
+          }
+        }
+
+        if (action === "updateOrder") {
+          const order = findOrder(payload.id);
+
+          if (order) {
+            Object.assign(order, payload.changes);
+          }
+        }
+
+        if (action === "deleteOrder") {
+          orders = orders.filter(
+            order =>
+              String(order.id) !== String(payload.id)
+          );
+        }
       } catch (error) {
         alert(
           "Perubahan belum terkonfirmasi:\n" +
@@ -539,6 +757,7 @@
     }
 
     async function updateStatus(id, status) {
+      if (isBusy()) return;
       if (!STATUSES.includes(status)) return;
 
       await mutate("updateOrder", {
@@ -548,97 +767,188 @@
     }
 
     async function deleteOrder(id) {
-      if (!confirm(
+      if (isBusy()) return;
+
+      const order = findOrder(id);
+      const hasPayment = Boolean(
+        splitPaymentNote(order?.note).paymentText
+      );
+
+      const message =
         `Hapus pesanan #${id} dari Google Sheets?\n` +
-        "Baris pesanan juga dihapus dari database."
-      )) return;
+        "Baris pesanan juga dihapus dari database." +
+        (
+          hasPayment
+            ? "\n\nPesanan ini memiliki catatan pembayaran. " +
+              "Menghapus pesanan tidak mengembalikan uang pelanggan."
+            : ""
+        );
+
+      if (!confirm(message)) return;
 
       await mutate("deleteOrder", { id });
     }
 
+    // ===================================================
+    // EDIT ORDER
+    // ===================================================
     async function editOrder(id) {
-      if (loading || writing) return;
+      if (isBusy()) return;
 
-      const order = orders.find(item => String(item.id) === String(id));
+      const order = findOrder(id);
       if (!order) return;
 
-      const fields = [
-        ["name", "Nama pelanggan"],
-        ["phone", "Nomor WhatsApp"],
-        ["address", "Alamat penjemputan"],
-        ["service", "Nama layanan"],
-        ["weight", "Berat / jumlah"],
-        ["note", "Catatan"],
-        ["priceEstimate", "Estimasi biaya"]
-      ];
+      const payment = splitPaymentNote(order.note);
+      const hasPayment = Boolean(payment.paymentText);
+
+      // Untuk transaksi kasir, nominal yang sudah dicatat
+      // tidak diubah lewat editor teks biasa.
+      const fields = hasPayment
+        ? [
+            ["name", "Nama pelanggan"],
+            ["phone", "Nomor WhatsApp"],
+            ["address", "Alamat / keterangan pengantaran"],
+            ["note", "Catatan khusus pelanggan"]
+          ]
+        : [
+            ["name", "Nama pelanggan"],
+            ["phone", "Nomor WhatsApp"],
+            ["address", "Alamat penjemputan"],
+            ["service", "Nama layanan"],
+            ["weight", "Berat / jumlah"],
+            ["note", "Catatan"],
+            ["priceEstimate", "Estimasi biaya"]
+          ];
+
+      if (hasPayment) {
+        alert(
+          "Pesanan ini memiliki pembayaran kasir.\n\n" +
+          "Edit di sini hanya mengubah data pelanggan " +
+          "dan catatan khusus. Layanan, berat, tarif, " +
+          "dan rincian pembayaran tetap dipertahankan."
+        );
+      }
 
       const changes = {};
 
       for (const [key, label] of fields) {
-        const input = prompt(label, String(order[key] ?? ""));
+        const original =
+          key === "note" && hasPayment
+            ? payment.customerNote
+            : String(order[key] ?? "");
+
+        const input = prompt(label, original);
+
         if (input === null) return;
 
         const next = input.trim();
 
         if (
-          ["name", "phone", "address", "service"].includes(key) &&
+          ["name", "phone", "address", "service"]
+            .includes(key) &&
           !next
         ) {
-          alert(`${label} tidak boleh kosong. Edit dibatalkan.`);
+          alert(
+            `${label} tidak boleh kosong. Edit dibatalkan.`
+          );
           return;
         }
 
-        if (next !== String(order[key] ?? "")) {
-          changes[key] = next;
+        if (next !== original) {
+          if (key === "note" && hasPayment) {
+            changes.note = [
+              next,
+              PAYMENT_MARKER + "\n" + payment.paymentText
+            ].filter(Boolean).join("\n\n");
+          } else {
+            changes[key] = next;
+          }
         }
       }
 
       if (!Object.keys(changes).length) return;
 
-      if (!confirm(`Simpan perubahan pesanan #${id} ke Google Sheets?`)) {
+      if (!confirm(
+        `Simpan perubahan pesanan #${id} ke Google Sheets?`
+      )) {
         return;
       }
 
-      await mutate("updateOrder", { id, changes });
+      await mutate("updateOrder", {
+        id,
+        changes
+      });
     }
 
+    // ===================================================
+    // TABLE EVENTS
+    // ===================================================
     tableBody?.addEventListener("click", event => {
-      const button = event.target.closest("button[data-action]");
-      if (!button) return;
+      const button = event.target.closest(
+        "button[data-action]"
+      );
+
+      if (!button || button.disabled) return;
 
       const id = button.closest("tr")?.dataset.id;
       if (!id) return;
 
       const action = button.dataset.action;
 
-      if (action === "receipt") showReceiptModal(id);
-      if (action === "edit") editOrder(id);
-      if (action === "delete") deleteOrder(id);
+      if (action === "receipt") {
+        showReceiptModal(id);
+      }
+
+      if (action === "edit") {
+        editOrder(id);
+      }
+
+      if (action === "delete") {
+        deleteOrder(id);
+      }
     });
 
     tableBody?.addEventListener("change", event => {
-      if (!event.target.matches('select[data-action="status"]')) return;
+      if (!event.target.matches(
+        'select[data-action="status"]'
+      )) {
+        return;
+      }
 
       const id = event.target.closest("tr")?.dataset.id;
-      if (id) updateStatus(id, event.target.value);
+
+      if (id) {
+        updateStatus(id, event.target.value);
+      }
     });
 
     // ===================================================
     // RECEIPT
     // ===================================================
-    function showReceiptModal(id) {
-      const order = orders.find(item => String(item.id) === String(id));
+    function showReceiptModal(id, fallbackOrder = null) {
+      const order = findOrder(id) || fallbackOrder;
+
       if (!order || !receiptPrintArea) return;
 
       const maps = mapLink(order);
+      const payment = splitPaymentNote(order.note);
 
       const rows = [
-        ["Pelanggan", `${order.name} (${order.phone})`],
+        [
+          "Pelanggan",
+          `${order.name} (${order.phone})`
+        ],
         ["Alamat", order.address],
         ["Paket Layanan", order.service],
-        ["Estimasi Jumlah", order.weight || "-"],
-        ["Catatan Khusus", order.note || "-"],
-        ["Estimasi Biaya", order.priceEstimate || "Sesuai Timbangan"],
+        ["Berat / Jumlah", order.weight || "-"],
+        [
+          "Tarif / Estimasi",
+          order.priceEstimate || "Sesuai Timbangan"
+        ],
+        [
+          "Catatan Khusus",
+          payment.customerNote || "-"
+        ],
         ["Status Cucian", order.status]
       ];
 
@@ -651,7 +961,10 @@
           </div>
 
           <div class="receipt-meta">
-            <span>NO. RESI: <b>#${escapeHtml(order.id)}</b></span>
+            <span>
+              NO. RESI:
+              <b>#${escapeHtml(order.id)}</b>
+            </span>
             <span>${escapeHtml(order.createdAt)}</span>
           </div>
 
@@ -661,13 +974,14 @@
             ${rows.map(([label, text]) => `
               <div class="receipt-row">
                 <span>${escapeHtml(label)}</span>
-                <span>${escapeHtml(text)}</span>
+                <span style="white-space:pre-line;">${escapeHtml(text)}</span>
               </div>
             `).join("")}
 
             ${
               maps
-                ? `<div class="receipt-row">
+                ? `
+                  <div class="receipt-row">
                     <span>Lokasi</span>
                     <span>
                       <a
@@ -676,10 +990,39 @@
                         rel="noopener noreferrer"
                       >Buka Google Maps</a>
                     </span>
-                  </div>`
+                  </div>
+                `
                 : ""
             }
           </div>
+
+          ${
+            payment.paymentText
+              ? `
+                <div class="receipt-divider"></div>
+
+                <div
+                  style="
+                    margin:10px 0;
+                    font-size:11px;
+                    font-weight:700;
+                    color:#10233c;
+                  "
+                >
+                  RINCIAN PEMBAYARAN
+                </div>
+
+                <div
+                  style="
+                    white-space:pre-line;
+                    overflow-wrap:anywhere;
+                    font-size:11px;
+                    line-height:1.8;
+                  "
+                >${escapeHtml(payment.paymentText)}</div>
+              `
+              : ""
+          }
 
           <div class="receipt-footer">
             <p>
@@ -694,150 +1037,428 @@
       show(receiptModal);
     }
 
-    ["#btnCloseReceipt", "#btnCloseReceipt2"].forEach(selector => {
-      $(selector)?.addEventListener("click", () => hide(receiptModal));
-    });
-
-    $("#btnPrintReceipt")?.addEventListener("click", () => window.print());
-
-    // ===================================================
-    // MANUAL ORDERS
-    // ===================================================
-    $("#btnNewManualOrder")?.addEventListener("click", () => {
-      if (writing || loading) return;
-
-      manualOrderForm?.reset();
-      pendingManualOrder = null;
-      pendingManualSignature = "";
-      show(manualModal);
-      $("#manualName")?.focus();
-    });
-
-    ["#btnCloseManual", "#btnCancelManual"].forEach(selector => {
+    [
+      "#btnCloseReceipt",
+      "#btnCloseReceipt2"
+    ].forEach(selector => {
       $(selector)?.addEventListener("click", () => {
-        if (!writing) hide(manualModal);
+        hide(receiptModal);
       });
     });
 
-    function priceFor(service) {
-      const prices = {
-        "Cuci Lipat (Reguler)": 5000,
-        "Cuci Setrika (Reguler)": 7000,
-        "Setrika Saja (Reguler)": 5000,
-        "Cuci Lipat (Express 24 Jam)": 7000,
-        "Cuci Setrika (Express 24 Jam)": 10000,
-        "Setrika Saja (Express 24 Jam)": 7000,
-        "Cuci Lipat (Express 6 Jam)": 10000,
-        "Cuci Setrika (Express 6 Jam)": 14000,
-        "Setrika Saja (Express 6 Jam)": 10000
-      };
+    $("#btnPrintReceipt")?.addEventListener(
+      "click",
+      () => window.print()
+    );
 
-      return prices[service]
-        ? `Rp${prices[service].toLocaleString("id-ID")} / kg`
-        : "Sesuai Timbangan";
+    // ===================================================
+    // CASHIER CALCULATION
+    // ===================================================
+    function getCashierValues() {
+      const service = value("#manualService");
+      const rate = SERVICE_RATES[service] || 0;
+
+      const weightInput = $("#manualWeight");
+      const cashInput = $("#manualCash");
+
+      const weight = weightInput?.valueAsNumber;
+      const cash = cashInput?.valueAsNumber;
+
+      const validWeight = Boolean(
+        weightInput &&
+        Number.isFinite(weight) &&
+        weight > 0 &&
+        weightInput.checkValidity()
+      );
+
+      const validCash = Boolean(
+        cashInput &&
+        Number.isFinite(cash) &&
+        Number.isSafeInteger(cash) &&
+        cash >= 0 &&
+        cashInput.checkValidity()
+      );
+
+      // Berat sampai dua angka desimal.
+      const hundredths = validWeight
+        ? Math.round(weight * 100)
+        : 0;
+
+      const total = validWeight
+        ? Math.round((hundredths * rate) / 100)
+        : 0;
+
+      return {
+        service,
+        rate,
+        weight,
+        cash,
+        total,
+        validWeight,
+        validCash,
+        change: validCash ? cash - total : 0
+      };
     }
 
-    function newId() {
-      const suffix = globalThis.crypto?.randomUUID
-        ? crypto.randomUUID().replace(/-/g, "").slice(0, 12)
-        : Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    function renderCashier() {
+      const bill = getCashierValues();
 
-      return `YG-${Date.now().toString(36)}-${suffix}`.toUpperCase();
-    }
+      setText(
+        "#cashierRate",
+        rupiah(bill.rate)
+      );
 
-    manualOrderForm?.addEventListener("submit", async event => {
-      event.preventDefault();
+      setText(
+        "#cashierWeight",
+        bill.validWeight
+          ? `${bill.weight.toLocaleString("id-ID")} kg`
+          : "0 kg"
+      );
 
-      if (writing || loading) return;
-      if (!manualOrderForm.reportValidity()) return;
+      setText(
+        "#cashierTotal",
+        rupiah(bill.total)
+      );
 
-      const fields = {
-        name: value("#manualName"),
-        phone: value("#manualPhone"),
-        address: value("#manualAddress"),
-        service: value("#manualService"),
-        weight: value("#manualWeight") || "-",
-        note: value("#manualNote") || "-",
-        lat: null,
-        lng: null,
-        gmapsLink: null,
-        status: "Menunggu Penjemputan"
-      };
+      const short =
+        bill.validWeight &&
+        bill.validCash &&
+        bill.cash < bill.total;
 
-      if (!fields.name || !fields.phone || !fields.address || !fields.service) {
-        alert("Nama, nomor WhatsApp, alamat, dan layanan wajib diisi.");
-        return;
+      const changeBox = $("#cashierChange")
+        ?.closest(".cashier-change");
+
+      changeBox?.classList.toggle(
+        "is-short",
+        short
+      );
+
+      setText(
+        "#cashierChangeLabel",
+        short ? "Uang masih kurang" : "Kembalian"
+      );
+
+      setText(
+        "#cashierChange",
+        bill.validWeight && bill.validCash
+          ? rupiah(Math.abs(bill.change))
+          : rupiah(0)
+      );
+
+      let message =
+        "Masukkan berat dan uang pelanggan.";
+
+      if (!bill.rate) {
+        message =
+          "Layanan ini belum memiliki tarif kasir.";
+      } else if (!bill.validWeight) {
+        message =
+          "Masukkan berat lebih dari 0, maksimal dua angka desimal.";
+      } else if (!bill.validCash) {
+        message =
+          "Masukkan uang tunai yang diterima, tanpa titik.";
+      } else if (short) {
+        message =
+          "Uang belum cukup. Pesanan belum bisa disimpan sebagai lunas.";
+      } else {
+        message =
+          "Pembayaran cukup. Pesanan siap disimpan sebagai lunas.";
       }
 
-      fields.priceEstimate = priceFor(fields.service);
+      setText(
+        "#cashierMessage",
+        message
+      );
+    }
 
-      const signature = JSON.stringify(fields);
+    $("#manualService")?.addEventListener(
+      "change",
+      renderCashier
+    );
 
-      if (!pendingManualOrder || signature !== pendingManualSignature) {
-        pendingManualOrder = {
-          id: newId(),
-          createdAt: new Date().toLocaleString("id-ID", {
-            timeZone: "Asia/Jakarta",
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-          }) + " WIB",
-          ...fields
+    $("#manualWeight")?.addEventListener(
+      "input",
+      renderCashier
+    );
+
+    $("#manualCash")?.addEventListener(
+      "input",
+      renderCashier
+    );
+
+    manualOrderForm?.addEventListener("reset", () => {
+      setTimeout(renderCashier, 0);
+    });
+
+    // ===================================================
+    // OPEN / CLOSE MANUAL ORDER
+    // ===================================================
+    $("#btnNewManualOrder")?.addEventListener(
+      "click",
+      () => {
+        if (isBusy()) return;
+
+        if (!manualOrderForm || !$("#manualCash")) {
+          alert(
+            "HTML kasir belum lengkap. Gunakan admin.html " +
+            "terbaru yang memiliki input manualCash."
+          );
+          return;
+        }
+
+        // Jika sebelumnya gagal, pertahankan isian dan ID
+        // agar tidak langsung membuat nomor pesanan baru.
+        if (!pendingManualOrder) {
+          manualOrderForm.reset();
+          pendingManualSignature = "";
+        }
+
+        renderCashier();
+        show(manualModal);
+        $("#manualName")?.focus();
+      }
+    );
+
+    function closeManualModal() {
+      if (writing || manualSubmitting) return;
+      hide(manualModal);
+    }
+
+    [
+      "#btnCloseManual",
+      "#btnCancelManual"
+    ].forEach(selector => {
+      $(selector)?.addEventListener(
+        "click",
+        closeManualModal
+      );
+    });
+
+    // ===================================================
+    // SAVE MANUAL ORDER + CASHIER
+    // ===================================================
+    manualOrderForm?.addEventListener(
+      "submit",
+      async event => {
+        event.preventDefault();
+
+        if (isBusy() || !adminPin) return;
+
+        if (!$("#manualCash")) {
+          alert(
+            "Input uang tunai belum tersedia pada HTML admin."
+          );
+          return;
+        }
+
+        if (!manualOrderForm.reportValidity()) return;
+
+        const bill = getCashierValues();
+
+        if (
+          !bill.rate ||
+          !bill.validWeight ||
+          !Number.isSafeInteger(bill.total) ||
+          bill.total <= 0
+        ) {
+          alert(
+            "Pilih layanan dan masukkan berat cucian yang valid."
+          );
+          return;
+        }
+
+        if (
+          !bill.validCash ||
+          bill.cash < bill.total
+        ) {
+          alert(
+            "Uang pelanggan belum cukup atau belum diisi dengan benar."
+          );
+          $("#manualCash")?.focus();
+          return;
+        }
+
+        const name = value("#manualName");
+        const phone = value("#manualPhone");
+        const address = value("#manualAddress");
+        const customerNote = value("#manualNote");
+
+        if (!name || !phone || !address) {
+          alert(
+            "Nama, nomor WhatsApp, dan alamat/keterangan wajib diisi."
+          );
+          return;
+        }
+
+        // Hindari penanda sistem masuk dari catatan biasa.
+        if (customerNote.includes(PAYMENT_MARKER)) {
+          alert(
+            "Catatan pelanggan tidak boleh memakai penanda pembayaran sistem."
+          );
+          return;
+        }
+
+        const paymentText = [
+          "Status pembayaran: LUNAS",
+          "Metode: Tunai",
+          `Tarif: ${rupiah(bill.rate)} / kg`,
+          `Berat: ${bill.weight.toLocaleString("id-ID")} kg`,
+          `Total tagihan: ${rupiah(bill.total)}`,
+          `Uang diterima: ${rupiah(bill.cash)}`,
+          `Kembalian: ${rupiah(bill.change)}`
+        ].join("\n");
+
+        const finalNote = [
+          customerNote,
+          PAYMENT_MARKER + "\n" + paymentText
+        ].filter(Boolean).join("\n\n");
+
+        const fields = {
+          name,
+          phone,
+          address,
+          service: bill.service,
+          weight:
+            `${bill.weight.toLocaleString("id-ID")} kg`,
+          note: finalNote,
+          lat: null,
+          lng: null,
+          gmapsLink: null,
+          priceEstimate: priceFor(bill.service),
+          status: "Menunggu Penjemputan"
         };
 
-        pendingManualSignature = signature;
-      }
+        const signature = JSON.stringify(fields);
 
-      const order = pendingManualOrder;
-      const controls = Array.from(manualOrderForm.elements);
-      const previous = controls.map(control => control.disabled);
+        if (
+          !pendingManualOrder ||
+          signature !== pendingManualSignature
+        ) {
+          // Jika isian berubah setelah kegagalan,
+          // minta pemeriksaan ID lama lebih dahulu.
+          if (pendingManualOrder) {
+            const proceed = confirm(
+              "Isian berubah setelah percobaan penyimpanan sebelumnya.\n\n" +
+              `Resi sebelumnya: ${pendingManualOrder.id}\n\n` +
+              "Pastikan resi itu belum tersimpan di database, " +
+              "agar tidak membuat pesanan ganda.\n\n" +
+              "Lanjut membuat nomor resi baru?"
+            );
 
-      controls.forEach(control => { control.disabled = true; });
+            if (!proceed) return;
+          }
 
-      let success;
+          pendingManualOrder = {
+            id: newId(),
+            createdAt: orderTime(),
+            ...fields
+          };
 
-      try {
-        success = await mutate("createOrder", { order });
-      } finally {
-        controls.forEach((control, index) => {
-          control.disabled = previous[index];
+          pendingManualSignature = signature;
+        }
+
+        const order = pendingManualOrder;
+
+        manualSubmitting = true;
+        manualOrderForm.setAttribute(
+          "aria-busy",
+          "true"
+        );
+
+        const controls = Array.from(
+          manualOrderForm.elements
+        );
+
+        const previous = controls.map(
+          control => control.disabled
+        );
+
+        controls.forEach(control => {
+          control.disabled = true;
         });
+
+        let success = false;
+
+        try {
+          success = await mutate(
+            "createOrder",
+            { order }
+          );
+        } finally {
+          controls.forEach((control, index) => {
+            control.disabled = previous[index];
+          });
+
+          manualSubmitting = false;
+          manualOrderForm.removeAttribute("aria-busy");
+          renderDashboard();
+        }
+
+        if (!success) {
+          alert(
+            "Formulir tetap disimpan di halaman ini.\n\n" +
+            `Nomor resi percobaan: ${order.id}\n\n` +
+            "Cek daftar pesanan terlebih dahulu sebelum " +
+            "mencoba kembali. Jangan tutup halaman jika " +
+            "ingin mempertahankan isian percobaan ini."
+          );
+          return;
+        }
+
+        hide(manualModal);
+
+        pendingManualOrder = null;
+        pendingManualSignature = "";
+
+        manualOrderForm.reset();
+        renderCashier();
+
+        // Fallback menampilkan order yang telah mendapat
+        // konfirmasi simpan jika pemuatan ulang gagal.
+        showReceiptModal(order.id, order);
       }
-
-      if (!success) return;
-
-      hide(manualModal);
-      manualOrderForm.reset();
-      pendingManualOrder = null;
-      pendingManualSignature = "";
-
-      showReceiptModal(order.id);
-    });
+    );
 
     // ===================================================
     // SEARCH / REFRESH / MODAL EVENTS
     // ===================================================
-    searchInput?.addEventListener("input", renderDashboard);
-    filterStatus?.addEventListener("change", renderDashboard);
+    searchInput?.addEventListener(
+      "input",
+      renderDashboard
+    );
 
-    refreshButton?.addEventListener("click", event => {
-      event.preventDefault();
-      loadOrders(true);
-    });
+    filterStatus?.addEventListener(
+      "change",
+      renderDashboard
+    );
+
+    refreshButton?.addEventListener(
+      "click",
+      event => {
+        event.preventDefault();
+
+        if (manualSubmitting) return;
+
+        loadOrders(true);
+      }
+    );
 
     window.addEventListener("click", event => {
-      if (receiptModal && event.target === receiptModal) {
+      if (
+        receiptModal &&
+        event.target === receiptModal
+      ) {
         hide(receiptModal);
       }
 
-      if (manualModal && event.target === manualModal && !writing) {
-        hide(manualModal);
+      if (
+        manualModal &&
+        event.target === manualModal
+      ) {
+        closeManualModal();
       }
     });
 
-    // Pertahankan nama fungsi jika HTML lama memakainya.
     window.updateStatus = updateStatus;
     window.deleteOrder = deleteOrder;
     window.showReceiptModal = showReceiptModal;
@@ -847,6 +1468,8 @@
     // STARTUP
     // ===================================================
     async function boot() {
+      renderCashier();
+
       const savedPin = getSessionPin();
 
       if (!savedPin) {
@@ -855,8 +1478,14 @@
       }
 
       try {
-        await api("adminLogin", {}, savedPin);
+        await api(
+          "adminLogin",
+          {},
+          savedPin
+        );
+
         adminPin = savedPin;
+
         showAdmin();
         await loadOrders(true);
       } catch (error) {
@@ -864,7 +1493,9 @@
 
         if (loginError) {
           loginError.textContent =
-            "Silakan login kembali. " + error.message;
+            "Silakan login kembali. " +
+            error.message;
+
           loginError.style.display = "block";
         }
       }
@@ -874,7 +1505,10 @@
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener(
+      "DOMContentLoaded",
+      init
+    );
   } else {
     init();
   }
