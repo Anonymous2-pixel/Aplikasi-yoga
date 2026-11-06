@@ -176,37 +176,36 @@
         </div>
 
         <div class="income-controls">
-<div class="income-controls">
-  <div class="income-filter-field">
-    <label for="incomeDate">Tanggal</label>
-    <input type="date" id="incomeDate">
-  </div>
+          <div class="income-filter-field">
+            <label for="incomeRangeStart">Dari tanggal</label>
+            <input type="date" id="incomeRangeStart">
+          </div>
 
-  <div class="income-filter-field">
-    <label for="incomeMonth">Bulan</label>
-    <input type="month" id="incomeMonth">
-  </div>
+          <div class="income-filter-field">
+            <label for="incomeRangeEnd">Sampai tanggal</label>
+            <input type="date" id="incomeRangeEnd">
+          </div>
 
-  <div class="income-filter-field">
-    <label for="incomeRangeStart">Dari tanggal</label>
-    <input type="date" id="incomeRangeStart">
-  </div>
+          <div class="income-filter-field">
+            <label for="incomeMonth">Bulan</label>
+            <input type="month" id="incomeMonth">
+          </div>
 
-  <div class="income-filter-field">
-    <label for="incomeRangeEnd">Sampai tanggal</label>
-    <input type="date" id="incomeRangeEnd">
-  </div>
-</div>
+          <div class="income-filter-field">
+            <label for="incomeYear">Tahun</label>
+            <select id="incomeYear"></select>
+          </div>
+        </div>
 
         <div class="income-summary">
-          <article class="income-card income-card-day">
+          <article class="income-card income-card-range">
             <div class="income-card-head">
-              <span id="incomeDayLabel">
-                Pemasukan tanggal pilihan
+              <span id="incomeRangeLabel">
+                Pemasukan rentang tanggal
               </span>
             </div>
 
-            <strong id="incomeDayTotal">Rp0</strong>
+            <strong id="incomeRangeTotal">Rp0</strong>
           </article>
 
           <article class="income-card income-card-month">
@@ -218,20 +217,13 @@
 
             <strong id="incomeMonthTotal">Rp0</strong>
           </article>
-<article class="income-card income-card-range">
-  <div class="income-card-head">
-    <span id="incomeRangeLabel">Pemasukan rentang tanggal</span>
-  </div>
 
-  <strong id="incomeRangeTotal">Rp0</strong>
-</article>
-            <article class="income-card income-card-range">
-  <div class="income-card-head">
-    <span id="incomeRangeLabel">Pemasukan rentang tanggal</span>
-  </div>
-
-  <strong id="incomeRangeTotal">Rp0</strong>
-</article>
+          <article class="income-card income-card-year">
+            <div class="income-card-head">
+              <span id="incomeYearLabel">
+                Total pemasukan tahun pilihan
+              </span>
+            </div>
 
             <strong id="incomeYearTotal">Rp0</strong>
           </article>
