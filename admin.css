@@ -1756,4 +1756,7 @@ button {
     font-size: 16px;
   }
 }
+.receipt-row span:last-child {
+  white-space: pre-line;
+}
 
