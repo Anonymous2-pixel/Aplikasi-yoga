@@ -577,238 +577,263 @@
       return amount;
     }
 
-    function renderIncomeDashboard() {
-      const dateInput = $("#incomeDate");
-      const monthInput = $("#incomeMonth");
-      const yearInput = $("#incomeYear");
-      const dailyList = $("#incomeDailyList");
+   function renderIncomeDashboard() {
+  const dateInput = $("#incomeDate");
+  const monthInput = $("#incomeMonth");
+  const yearInput = $("#incomeYear");
+  const rangeStartInput = $("#incomeRangeStart");
+  const rangeEndInput = $("#incomeRangeEnd");
+  const dailyList = $("#incomeDailyList");
 
-      if (
-        !dateInput ||
-        !monthInput ||
-        !yearInput ||
-        !dailyList
-      ) {
-        return;
-      }
-
-      const today = jakartaDateKey();
-
-      if (!dateInput.value) dateInput.value = today;
-
-      if (!monthInput.value) {
-        monthInput.value = today.slice(0, 7);
-      }
-
-      const selectedDate = dateInput.value;
-      const selectedMonth = monthInput.value;
-
-      // Buat daftar tahun dari tanggal pesanan.
-      const years = Array.from(
-        new Set(
-          orders
-            .map(order =>
-              orderDateKey(order.createdAt).slice(0, 4)
-            )
-            .filter(Boolean)
-        )
-      ).sort();
-const currentYear = Number(today.slice(0, 4));
-
-// Tampilkan 10 tahun ke depan:
-// 2026 sampai 2035, lalu otomatis bergeser tiap tahun.
-for (
-  let year = currentYear;
-  year <= currentYear + 9;
-  year++
-) {
-  const yearText = String(year);
-
-  if (!years.includes(yearText)) {
-    years.push(yearText);
+  if (
+    !dateInput ||
+    !monthInput ||
+    !yearInput ||
+    !rangeStartInput ||
+    !rangeEndInput ||
+    !dailyList
+  ) {
+    return;
   }
-}
 
-years.sort();
+  const today = jakartaDateKey();
 
-      const previousYear = yearInput.value;
+  if (!dateInput.value) dateInput.value = today;
 
-      yearInput.innerHTML = years.map(year => `
-        <option value="${year}">${year}</option>
-      `).join("");
+  if (!monthInput.value) {
+    monthInput.value = today.slice(0, 7);
+  }
 
-      if (years.includes(previousYear)) {
-        yearInput.value = previousYear;
-      } else {
-        yearInput.value = currentYear;
-      }
+  if (!rangeStartInput.value) {
+    rangeStartInput.value = today;
+  }
 
-      const selectedYear = yearInput.value;
+  if (!rangeEndInput.value) {
+    rangeEndInput.value = today;
+  }
 
-      let dayTotal = 0;
-      let dayCount = 0;
+  const selectedDate = dateInput.value;
+  const selectedMonth = monthInput.value;
 
-      let monthTotal = 0;
-      let monthCount = 0;
+  // Buat daftar tahun dari tanggal pesanan.
+  const years = Array.from(
+    new Set(
+      orders
+        .map(order =>
+          orderDateKey(order.createdAt).slice(0, 4)
+        )
+        .filter(Boolean)
+    )
+  ).sort();
 
-      let yearTotal = 0;
-      let yearCount = 0;
+  const currentYear = Number(today.slice(0, 4));
 
-      let withoutPayment = 0;
-      let invalidDateCount = 0;
-      let cancelledPaidCount = 0;
+  // Tampilkan 10 tahun ke depan.
+  for (
+    let year = currentYear;
+    year <= currentYear + 9;
+    year++
+  ) {
+    const yearText = String(year);
 
-      const daily = new Map();
+    if (!years.includes(yearText)) {
+      years.push(yearText);
+    }
+  }
 
-      orders.forEach(order => {
-        const amount = getRecordedPaymentTotal(order);
+  years.sort();
 
-        if (amount === null) {
-          withoutPayment += 1;
-          return;
-        }
+  const previousYear = yearInput.value;
 
-        const dateKey = orderDateKey(order.createdAt);
+  yearInput.innerHTML = years.map(year => `
+    <option value="${year}">${year}</option>
+  `).join("");
 
-        if (!dateKey) {
-          invalidDateCount += 1;
-          return;
-        }
+  if (years.includes(previousYear)) {
+    yearInput.value = previousYear;
+  } else {
+    yearInput.value = String(currentYear);
+  }
 
-        const orderYear = dateKey.slice(0, 4);
+  const selectedYear = yearInput.value;
 
-        // Pemasukan tahun dipilih, terpisah antar tahun.
-        if (orderYear === selectedYear) {
-          yearTotal += amount;
-          yearCount += 1;
-        }
+  // Rentang tanggal. Jika tanggal awal dan akhir
+  // tertukar, sistem otomatis mengurutkannya.
+  let rangeStart = rangeStartInput.value;
+  let rangeEnd = rangeEndInput.value;
 
-        if (order.status === "Dibatalkan") {
-          cancelledPaidCount += 1;
-        }
+  if (rangeStart > rangeEnd) {
+    [rangeStart, rangeEnd] = [rangeEnd, rangeStart];
+  }
 
-        if (dateKey === selectedDate) {
-          dayTotal += amount;
-          dayCount += 1;
-        }
+  let dayTotal = 0;
+  let monthTotal = 0;
+  let yearTotal = 0;
+  let rangeTotal = 0;
 
-        if (dateKey.slice(0, 7) === selectedMonth) {
-          monthTotal += amount;
-          monthCount += 1;
+  let withoutPayment = 0;
+  let invalidDateCount = 0;
+  let cancelledPaidCount = 0;
 
-          const entry = daily.get(dateKey) || {
-            total: 0,
-            count: 0
-          };
+  const daily = new Map();
 
-          entry.total += amount;
-          entry.count += 1;
+  orders.forEach(order => {
+    const amount = getRecordedPaymentTotal(order);
 
-          daily.set(dateKey, entry);
-        }
-      });
-
-      setText(
-        "#incomeDayLabel",
-        displayIncomeDate(selectedDate)
-      );
-
-      setText("#incomeDayTotal", rupiah(dayTotal));
-      setText(
-        "#incomeDayCount",
-        `${dayCount} pesanan lunas`
-      );
-
-      setText(
-        "#incomeMonthLabel",
-        displayIncomeMonth(selectedMonth)
-      );
-
-      setText("#incomeMonthTotal", rupiah(monthTotal));
-      setText(
-        "#incomeMonthCount",
-        `${monthCount} pesanan lunas`
-      );
-
-      setText(
-        "#incomeYearLabel",
-        `Pemasukan tahun ${selectedYear}`
-      );
-
-      setText("#incomeYearTotal", rupiah(yearTotal));
-      setText(
-        "#incomeYearCount",
-        `${yearCount} pesanan lunas`
-      );
-
-      setText(
-        "#incomeRecapPeriod",
-        displayIncomeMonth(selectedMonth)
-      );
-
-      const entries = Array.from(daily.entries())
-        .sort(([dateA], [dateB]) =>
-          dateB.localeCompare(dateA)
-        );
-
-      dailyList.innerHTML = entries.length
-        ? entries.map(([dateKey, entry]) => `
-            <div class="income-day-row">
-              <div>
-                <b>
-                  ${escapeHtml(
-                    displayIncomeDate(dateKey)
-                  )}
-                </b>
-                <small>${entry.count} pesanan lunas</small>
-              </div>
-              <strong>
-                ${escapeHtml(rupiah(entry.total))}
-              </strong>
-            </div>
-          `).join("")
-        : `
-            <p class="income-empty">
-              Belum ada pembayaran kasir tercatat pada bulan ini.
-            </p>
-          `;
-
-      const notices = [
-        "Rekap memakai tanggal pembuatan pesanan, bukan tanggal pembayaran terpisah.",
-        `${withoutPayment} pesanan tidak dihitung karena tidak memiliki catatan pembayaran kasir yang dapat dibaca.`,
-        "Pemasukan tahun dihitung terpisah untuk setiap tahun."
-      ];
-
-      if (invalidDateCount) {
-        notices.push(
-          `${invalidDateCount} pesanan lunas memiliki tanggal yang tidak terbaca, sehingga tidak masuk rekap harian, bulanan, maupun tahunan.`
-        );
-      }
-
-      if (cancelledPaidCount) {
-        notices.push(
-          `${cancelledPaidCount} pesanan berstatus Dibatalkan masih memiliki catatan lunas dan tetap dihitung. Refund belum dicatat oleh sistem.`
-        );
-      }
-
-      setText("#incomeNotice", notices.join(" "));
+    if (amount === null) {
+      withoutPayment += 1;
+      return;
     }
 
-    $("#incomeDate")?.addEventListener(
-      "change",
-      renderIncomeDashboard
+    const dateKey = orderDateKey(order.createdAt);
+
+    if (!dateKey) {
+      invalidDateCount += 1;
+      return;
+    }
+
+    const orderYear = dateKey.slice(0, 4);
+
+    if (orderYear === selectedYear) {
+      yearTotal += amount;
+    }
+
+    if (order.status === "Dibatalkan") {
+      cancelledPaidCount += 1;
+    }
+
+    if (dateKey === selectedDate) {
+      dayTotal += amount;
+    }
+
+    if (dateKey.slice(0, 7) === selectedMonth) {
+      monthTotal += amount;
+
+      const entry = daily.get(dateKey) || {
+        total: 0,
+        count: 0
+      };
+
+      entry.total += amount;
+      entry.count += 1;
+
+      daily.set(dateKey, entry);
+    }
+
+    // Rentang tanggal: tanggal awal dan akhir ikut dihitung.
+    if (
+      dateKey >= rangeStart &&
+      dateKey <= rangeEnd
+    ) {
+      rangeTotal += amount;
+    }
+  });
+
+  setText(
+    "#incomeDayLabel",
+    displayIncomeDate(selectedDate)
+  );
+
+  setText("#incomeDayTotal", rupiah(dayTotal));
+
+  setText(
+    "#incomeMonthLabel",
+    displayIncomeMonth(selectedMonth)
+  );
+
+  setText("#incomeMonthTotal", rupiah(monthTotal));
+
+  setText(
+    "#incomeYearLabel",
+    `Total pemasukan tahun ${selectedYear}`
+  );
+
+  setText("#incomeYearTotal", rupiah(yearTotal));
+
+  setText(
+    "#incomeRangeLabel",
+    `Pemasukan ${displayIncomeDate(rangeStart)} — ${displayIncomeDate(rangeEnd)}`
+  );
+
+  setText("#incomeRangeTotal", rupiah(rangeTotal));
+
+  setText(
+    "#incomeRecapPeriod",
+    displayIncomeMonth(selectedMonth)
+  );
+
+  const entries = Array.from(daily.entries())
+    .sort(([dateA], [dateB]) =>
+      dateB.localeCompare(dateA)
     );
 
-    $("#incomeMonth")?.addEventListener(
-      "change",
-      renderIncomeDashboard
-    );
+  dailyList.innerHTML = entries.length
+    ? entries.map(([dateKey, entry]) => `
+        <div class="income-day-row">
+          <div>
+            <b>
+              ${escapeHtml(
+                displayIncomeDate(dateKey)
+              )}
+            </b>
+            <small>${entry.count} pesanan</small>
+          </div>
+          <strong>
+            ${escapeHtml(rupiah(entry.total))}
+          </strong>
+        </div>
+      `).join("")
+    : `
+        <p class="income-empty">
+          Belum ada pembayaran kasir tercatat pada bulan ini.
+        </p>
+      `;
 
-    $("#incomeYear")?.addEventListener(
-      "change",
-      renderIncomeDashboard
-    );
+  const notices = [
+    "Rekap memakai tanggal pembuatan pesanan, bukan tanggal pembayaran terpisah.",
+    `${withoutPayment} pesanan tidak dihitung karena tidak memiliki catatan pembayaran kasir yang dapat dibaca.`,
+    "Filter rentang tanggal menghitung tanggal awal dan tanggal akhir."
+  ];
 
+  if (invalidDateCount) {
+    notices.push(
+      `${invalidDateCount} pesanan lunas memiliki tanggal yang tidak terbaca, sehingga tidak masuk rekap.`
+    );
+  }
+
+  if (cancelledPaidCount) {
+    notices.push(
+      `${cancelledPaidCount} pesanan berstatus Dibatalkan masih memiliki catatan lunas dan tetap dihitung.`
+    );
+  }
+
+  setText("#incomeNotice", notices.join(" "));
+}
+
+$("#incomeDate")?.addEventListener(
+  "change",
+  renderIncomeDashboard
+);
+
+$("#incomeMonth")?.addEventListener(
+  "change",
+  renderIncomeDashboard
+);
+
+$("#incomeYear")?.addEventListener(
+  "change",
+  renderIncomeDashboard
+);
+
+$("#incomeRangeStart")?.addEventListener(
+  "change",
+  renderIncomeDashboard
+);
+
+$("#incomeRangeEnd")?.addEventListener(
+  "change",
+  renderIncomeDashboard
+);
     // ===================================================
     // DASHBOARD / TABLE
     // ===================================================
