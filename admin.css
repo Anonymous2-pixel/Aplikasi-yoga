@@ -2634,3 +2634,18 @@ button {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* Kartu pemasukan rentang tanggal */
+.income-card-range {
+  background: #f5f3ff;
+  border-color: #ddd6fe;
+}
+
+.income-card-range strong {
+  color: #6d28d9;
+}
+
+@media screen and (max-width: 768px) {
+  .income-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
